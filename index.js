@@ -3,9 +3,6 @@
 const express = require('express');
 const app = express();
 
-//Parse requests with json payloads
-app.use(express.json());
-
 //To read env variables
 require('dotenv').config();
 
