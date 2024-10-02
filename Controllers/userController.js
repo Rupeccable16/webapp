@@ -27,8 +27,6 @@ exports.createUser = async (req, res) => {
     return res.status(400).send();
   }
 
-  //console.log('Details are', first_name,last_name,email,password);
-
   const hashedPass = bcrypt.hashSync(password, saltRounds);
 
   const new_user = await User.create({
@@ -109,7 +107,7 @@ exports.handleUserRequest = async (req, res) => {
       if (req.headers["content-length"]) {
         return res.status(400).send();
       }
-      
+
       //Get user function
       const user = req.user.dataValues;
 
@@ -124,9 +122,9 @@ exports.handleUserRequest = async (req, res) => {
 
       return res.status(200).send(userResponse);
 
-    } else if (req.method === "PUT") {
+    } 
+    else if (req.method === "PUT") {
       //Update user function
-
       const user = req.user.dataValues;
 
       const allowedValues = ["first_name", "last_name", "password"];
@@ -140,12 +138,38 @@ exports.handleUserRequest = async (req, res) => {
           flag = true;
         }
       });
-
+      
       if (!flag || !req.body) {
-        res.status(400).send();
+        return res.status(400).send();
       }
 
       let { password, first_name, last_name } = req.body;
+
+      let allFieldsSame = true;
+
+      if (password) {
+        if (!bcrypt.compareSync(password,user.password)) {
+          allFieldsSame = false;
+        }
+      }
+
+      if (first_name) {
+        if (first_name != user.first_name) {
+          allFieldsSame = false;
+        }
+      }
+      
+      if (last_name) {
+        if (last_name != user.last_name) {
+          allFieldsSame = false;
+        }
+      }
+
+      if(allFieldsSame){
+        console.log("All fields same")
+        return res.status(204).send();
+      }
+
       if (password) {
         password = await bcrypt.hashSync(password, saltRounds);
       }
@@ -161,12 +185,12 @@ exports.handleUserRequest = async (req, res) => {
         where: { email: user.email },
       });
 
-      res.status(204).send();
+      return res.status(204).send();
     } else {
       return res.status(405).send();
     }
   } catch (err) {
-    console.log("Catch block of userController.handleRequest");
-    return res.status(500);
+    console.log("Catch block of userController.handleRequest", err);
+    return res.status(400).send();
   }
 };
