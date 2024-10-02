@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.createUser = async (req, res) => {
+
+  //Cache control set to no cache
+  res.setHeader("Cache-Control", "no-cache");
   
   if (req.method != "POST") {
     return res.status(405).send();
@@ -97,6 +100,9 @@ exports.updateUser = async (req, res) => {
 
 exports.handleUserRequest = async (req, res) => {
   try {
+    //Cache control set to no cache
+    res.setHeader("Cache-Control", "no-cache");
+
     if (req.method === "GET") {
       //Get user function
       const user = req.user.dataValues;
@@ -129,7 +135,7 @@ exports.handleUserRequest = async (req, res) => {
         }
       });
 
-      if (!flag) {
+      if (!flag || !req.body) {
         res.status(400).send();
       }
 
