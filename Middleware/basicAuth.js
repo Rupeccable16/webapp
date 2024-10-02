@@ -15,6 +15,11 @@ exports.authorize = async (req, res, next) => {
   const credentials = Buffer.from(base64Creds, "base64").toString("ascii");
   const [email, password] = credentials.split(":");
   const user = await User.findOne({ where: { email: email } });
+
+  if (!user){
+    console.log("Unauthorized User Token");
+    return res.status(401).send();
+  }
   const passAuth = await bcrypt.compareSync(password, user.password);
 
   if (passAuth) {

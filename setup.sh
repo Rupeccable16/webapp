@@ -7,7 +7,7 @@ apt upgrade -y
 echo "Installing unzip"
 apt install unzip
 
-cd /tmp
+#cd /tmp
 #unzip webapp.zip
 #unzip env.zip
 
@@ -43,6 +43,3 @@ apt install npm -y
 
 echo "Installing dependencies"
 npm i
-
-echo "Running webapp"
-node server.js

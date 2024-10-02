@@ -104,6 +104,12 @@ exports.handleUserRequest = async (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
 
     if (req.method === "GET") {
+
+      //No params
+      if (req.headers["content-length"]) {
+        return res.status(400).send();
+      }
+      
       //Get user function
       const user = req.user.dataValues;
 
