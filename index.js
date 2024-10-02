@@ -6,6 +6,10 @@ const app = express();
 //To read env variables
 require('dotenv').config();
 
+//Boostrap db
+const { sequelize } = require('./db');
+sequelize.sync().then(console.log('SYNCED'));
+
 //Route all requests to routes.js
 const routes = require('./Routes/routes');
 app.use('/',routes);
