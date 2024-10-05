@@ -1,0 +1,13 @@
+name: pull_req workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  checkout_repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
