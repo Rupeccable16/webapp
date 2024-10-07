@@ -1,13 +1,16 @@
 name: pull_req workflow
-
 on:
   pull_request:
-    branches:
-      - main
-
+    branches: [main]
 jobs:
-  checkout_repo:
+  npm-install:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: setup node
+        uses: actions/setup-node@v2
+      - name: install dependencies
+        run: npm install
+      - name: check completion
+        run: echo "Check completion"
