@@ -9,9 +9,9 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v4
       - name: setup node
+        uses: actions/setup-node@v2
         with:
           node-version: '20.9.0'
-        uses: actions/setup-node@v2
       - name: install dependencies
         run: npm install
       - name: install postgres
