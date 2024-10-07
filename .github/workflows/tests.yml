@@ -1,0 +1,34 @@
+name: Integration test
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+      - name: setup node
+        with:
+          node-version: '20.9.0'
+        uses: actions/setup-node@v2
+      - name: install dependencies
+        run: npm install
+      - name: install postgres
+        uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: ${{ secrets.PSQL_USER }}
+          password: ${{ secrets.PSQL_PASS }}
+          database: ${{ secrets.PSQL_DBNAME }}
+          port: 5432
+        id: postgres
+      - name: integration test
+        run: npm test
+        env:
+          POSTGRES_HOST: localhost
+          PSQL_USER: ${{ secrets.PSQL_USER }}
+          PSQL_PASS: ${{ secrets.PSQL_PASS }}
+          PSQL_DBNAME: ${{ secrets.PSQL_DBNAME }}
+          PORT: 5000
+      - name: check completion
+        run: echo "Check completion"
