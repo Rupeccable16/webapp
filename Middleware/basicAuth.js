@@ -18,7 +18,7 @@ exports.authorize = async (req, res, next) => {
 
   if (!user){
     console.log("Unauthorized User Token");
-    return res.status(401).send();
+    return res.status(401).send(); //Unauthorized
   }
   const passAuth = await bcrypt.compareSync(password, user.password);
 
