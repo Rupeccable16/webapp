@@ -8,7 +8,7 @@ exports.authorize = async (req, res, next) => {
     !req.headers.authorization ||
     req.headers.authorization.indexOf("Basic") === -1
   ) {
-    return res.status(400).send();
+    return res.status(401).send();
   }
 
   const base64Creds = req.headers.authorization.split(" ")[1];
