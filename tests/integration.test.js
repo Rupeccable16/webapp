@@ -5,7 +5,7 @@ const {User} = require('../Models/userModel');
 const {sequelize, testDbConnection} = require('../db');
 
 beforeAll(async() => {
-    await sequelize.sync({alter:true}).then(console.log('Synced inside test'));
+    await sequelize.sync({force:true}).then(console.log('Synced inside test'));
 })
 
 const postData = {
