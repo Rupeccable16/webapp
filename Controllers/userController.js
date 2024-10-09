@@ -15,7 +15,7 @@ exports.createUser = async (req, res) => {
 
   const { first_name, last_name, email, password } = req.body;
 
-  if (!first_name || !last_name || !password || !email) {
+  if (!first_name || !last_name || !password || !email || length(password)<3) {
     return res.status(400).send();
   }
 
@@ -171,6 +171,9 @@ exports.handleUserRequest = async (req, res) => {
       }
 
       if (password) {
+        if (length(password)<3) {
+          return res.status(400).send();
+        }
         password = await bcrypt.hashSync(password, saltRounds);
       }
 
