@@ -35,7 +35,7 @@ describe("TEST! - Create and get user at /v1/user", ()=> {
         const response = await request(app)
             .get('/v1/user/self')
             .auth(postData.email,postData.password)
-            .expect(200);
+            .expect(204);
     });
 });
 
