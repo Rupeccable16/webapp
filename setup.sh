@@ -1,15 +1,11 @@
 #!/bin/bash
 
-echo "Update and Upgrade"
-apt update
-apt upgrade -y
+# echo "Update and Upgrade"
+# apt update
+# apt upgrade -y
 
 echo "Installing unzip"
 apt install unzip
-
-#cd /tmp
-#unzip webapp.zip
-#unzip env.zip
 
 echo "Setup postgres"
 sudo apt install postgresql postgresql-contrib -y
