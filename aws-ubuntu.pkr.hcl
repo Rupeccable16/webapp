@@ -48,13 +48,12 @@ build {
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1" #disables packer's usage and data statistics
     ]
-    scripts = [
-      "os_upgrade.sh",
-    ]
+    script = "scripts/os_upgrade.sh",
+    
   }
 
   provisioner "shell" {
-    script = "app_dir_setup.sh",
+    script = "scripts/app_dir_setup.sh",
   }
 
   // provisioner "file"{ #For assignment 5 onwards
@@ -67,6 +66,11 @@ build {
     destination = "/tmp/"
   }
 
+    provisioner "file" {
+    source = "csye6225.service"
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     environment_vars = [
       "db_user=${var.db_user}",
@@ -74,8 +78,8 @@ build {
       "db_pass=${var.db_pass}"
     ]
     scripts = [
-      "setup.sh",
-      "systemd.sh"
+      "scripts/setup.sh",
+      "scripts/systemd.sh"
     ]
   }
 

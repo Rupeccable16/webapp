@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo cp /opt/webapp/csye6225.service /etc/systemd/system/csye6225.service
+sudo cp /tmp/csye6225.service /etc/systemd/system/csye6225.service
 cd /etc/systemd/system
 
 echo "daemon reload"
