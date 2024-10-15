@@ -54,14 +54,13 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DEBIAN_FRONTEND=noninteractive",
-      "CHECKPOINT_DISABLE=1" #disables packer's usage and data statistics
-    ]
-    scripts = [
-      "app_dir_setup.sh",
-    ]
+    script = "app_dir_setup.sh",
   }
+
+  // provisioner "file"{ #For assignment 5 onwards
+  //   source = "app.properties"
+  //   destination = "/tmp/app.properties"
+  // }
 
   provisioner "file" {
     source = "webapp.zip"
@@ -76,6 +75,7 @@ build {
     ]
     scripts = [
       "setup.sh",
+      "systemd.sh"
     ]
   }
 

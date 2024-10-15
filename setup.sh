@@ -39,6 +39,7 @@ ls -al
 
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
+sudo chmod -R 755 /opt/webapp
 
 ls -al
 
