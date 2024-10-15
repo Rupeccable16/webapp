@@ -7,6 +7,9 @@
 echo "Installing unzip"
 apt install unzip
 
+echo "Unzipping webapp"
+sudo unzip /tmp/webapp.zip -d /opt/webapp
+
 echo "Setup postgres"
 sudo apt install postgresql postgresql-contrib -y
 sudo systemctl start postgresql
@@ -32,10 +35,20 @@ sudo sed -i 's/^host\s\+all\s\+all\s\+::1\/128\s\+scram-sha-256/host    all     
 echo "Restart postgres"
 sudo systemctl restart postgresql
 
+ls -al
+
+echo "Changing Ownership"
+sudo chown -R csye6225:csye6225 "/opt/webapp/"
+
+ls -al
+
 echo "Installing node"
-apt install nodejs -y
+sudo apt install nodejs -y
 echo "Installing npm"
-apt install npm -y
+sudo apt install npm -y
 
 echo "Installing dependencies"
-npm i
+cd /opt/webapp/
+sudo npm i
+
+echo "Setup done"

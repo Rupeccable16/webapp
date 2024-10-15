@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 1.0.0, >2.0.0"
+      version = ">=1.0.0, <2.0.0"
       source  = "github.com/hashicorp/amazon"
     }
   }
@@ -20,7 +20,7 @@ source "amazon-ebs" "ubuntu" {
     max_attempts  = 50
   }
 
-  instance_type = "t2.small"
+  instance_type = "t2.small" #Downsize during assignment 5 onwards
   source_ami    = "ami-0866a3c8686eaeeba"
   ssh_username  = "ubuntu"
   subnet_id     = "subnet-0e11e5baa90d9d2b0"
@@ -28,9 +28,10 @@ source "amazon-ebs" "ubuntu" {
   #Storage attached to VM
 
   launch_block_device_mappings {
-    device_name = "/dev/sda1"
-    encrypted   = true
-    kms_key_id  = "1a2b3c4d-5e6f-1a2b-3c4d-5e6f1a2b3c4d"
+    delete_on_termination = true
+    device_name           = "/dev/sda1"
+    volume_size           = 8
+    volume_type           = "gp2"
   }
 
 
@@ -44,12 +45,27 @@ build {
 
   provisioner "shell" {
     environment_vars = [
-      "DEBIAN_FRONTEND=interactive",
+      "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1" #disables packer's usage and data statistics
     ]
     scripts = [
-      "os_upgrade.sh"
+      "os_upgrade.sh",
     ]
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "DEBIAN_FRONTEND=noninteractive",
+      "CHECKPOINT_DISABLE=1" #disables packer's usage and data statistics
+    ]
+    scripts = [
+      "app_dir_setup.sh",
+    ]
+  }
+
+  provisioner "file" {
+    source = "webapp.zip"
+    destination = "/tmp/"
   }
 
   provisioner "shell" {
@@ -60,7 +76,6 @@ build {
     ]
     scripts = [
       "setup.sh",
-      "systemd.sh"
     ]
   }
 

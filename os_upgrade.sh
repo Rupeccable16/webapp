@@ -1,4 +1,5 @@
 #!/bin/bash
 
-apt update
-apt upgrade -y
+echo "Updating and upgrading"
+sudo apt-get update
+sudo apt-get upgrade -y
