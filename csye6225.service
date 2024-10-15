@@ -3,15 +3,12 @@ Description=CSYE 6225 App
 After=network.target
 
 [Service]
+Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt/webapp/
 ExecStart=/usr/bin/node /opt/webapp/server.js
-Restart=always
-RestartSec=3
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=csye6225
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
