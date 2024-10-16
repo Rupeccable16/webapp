@@ -8,6 +8,40 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.9.0'
+      - name: install dependencies
+        run: npm install
+      - name: install postgres
+        uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: ${{ secrets.PSQL_USER }}
+          password: ${{ secrets.PSQL_PASS }}
+          database: ${{ secrets.PSQL_DBNAME }}
+          port: 5432
+        id: postgres
+      - name: integration test
+        run: npm test
+        env:
+          POSTGRES_HOST: localhost
+          PSQL_USER: ${{ secrets.PSQL_USER }}
+          PSQL_PASS: ${{ secrets.PSQL_PASS }}
+          PSQL_DBNAME: ${{ secrets.PSQL_DBNAME }}
+          TEST_CHANGE_FIRSTNAME: ${{ secrets.TEST_CHANGE_FIRSTNAME}}
+          TEST_CHANGE_PASSWORD: ${{ secrets.TEST_CHANGE_PASSWORD }}
+          TEST_POSTDATA_EMAIL: ${{ secrets.TEST_POSTDATA_EMAIL }}
+          TEST_POSTDATA_FIRSTNAME: ${{ secrets.TEST_POSTDATA_FIRSTNAME }}
+          TEST_POSTDATA_LASTNAME: ${{ secrets.TEST_POSTDATA_LASTNAME }}
+          TEST_POSTDATA_PASS: ${{ secrets.TEST_POSTDATA_PASS }}
+          PORT: 5000
+      - name: check completion
+        run: echo "Check completion"
+      - name: Zip webapp
+        run: |
+          [ -e webapp.zip] && rm -rf webapp.zip
+          zip -r webapp.zip . -x ".git/*" ".github/*"
       - name: setup packer
         uses: hashicorp/setup-packer@main
         id: setup
@@ -19,3 +53,8 @@ jobs:
         run: packer fmt -check -recursive .
       - name: packer validate
         run: packer validate .
+      - name: install aws cli
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          managed-session-policies: arn:aws:iam::597088036798:policy/AWS-Packer-GithubActions

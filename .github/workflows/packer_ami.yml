@@ -1,0 +1,23 @@
+name: Packer check workflow
+on:
+  pull_request:
+    types:
+      - closed
+jobs:
+  packer-build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: setup packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+            version: 1.11.2
+      - name: packer init
+        run: packer init .
+      - name: packer fmt
+        run: packer fmt -check -recursive .
+      - name: packer validate
+        run: packer validate .
