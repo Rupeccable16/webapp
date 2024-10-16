@@ -97,7 +97,7 @@ source "amazon-ebs" "ubuntu" {
   ssh_username  = "${var.ami_ssh_username}"
   subnet_id     = "${var.ami_subnet_id}"
 
-  #Storage attached to VM
+  #Storage attached to VM 
 
   launch_block_device_mappings {
     delete_on_termination = true
