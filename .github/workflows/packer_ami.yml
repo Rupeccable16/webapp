@@ -1,14 +1,58 @@
-name: Packer check workflow
+name: Packer build workflow
 on:
   pull_request:
-    branches: [main]
+    types:
+      - closed
 jobs:
-  packer-check:
+  packer-build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: create .env
+        run: |
+          echo "${{ secrets.ENV_VARS }}" > .env
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.9.0'
+      - name: install dependencies
+        run: npm install
+      - name: install aws cli
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}       
+      - name: install postgres
+        uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: ${{ secrets.PSQL_USER }}
+          password: ${{ secrets.PSQL_PASS }}
+          database: ${{ secrets.PSQL_DBNAME }}
+          port: 5432
+        id: postgres
+      - name: integration test
+        run: npm test
+        env:
+          POSTGRES_HOST: localhost
+          PSQL_USER: ${{ secrets.PSQL_USER }}
+          PSQL_PASS: ${{ secrets.PSQL_PASS }}
+          PSQL_DBNAME: ${{ secrets.PSQL_DBNAME }}
+          TEST_CHANGE_FIRSTNAME: ${{ secrets.TEST_CHANGE_FIRSTNAME}}
+          TEST_CHANGE_PASSWORD: ${{ secrets.TEST_CHANGE_PASSWORD }}
+          TEST_POSTDATA_EMAIL: ${{ secrets.TEST_POSTDATA_EMAIL }}
+          TEST_POSTDATA_FIRSTNAME: ${{ secrets.TEST_POSTDATA_FIRSTNAME }}
+          TEST_POSTDATA_LASTNAME: ${{ secrets.TEST_POSTDATA_LASTNAME }}
+          TEST_POSTDATA_PASS: ${{ secrets.TEST_POSTDATA_PASS }}
+          PORT: 5000
+      - name: check completion
+        run: echo "Check completion"
+      - name: Zip webapp
+        run: |
+          [ -e webapp.zip] && rm -rf webapp.zip
+          zip -r webapp.zip . -x ".git/*" ".github/*"
       - name: setup packer
         uses: hashicorp/setup-packer@main
         id: setup
@@ -20,3 +64,21 @@ jobs:
         run: packer fmt -check -recursive .
       - name: packer validate
         run: packer validate .
+      - name: packer build
+        run: |
+          packer build \
+          -var "aws_region=${{ secrets.AWS_REGION }}" \
+          -var "db_user=${{ secrets.PSQL_USER }}" \
+          -var "db_pass=${{ secrets.PSQL_PASS }}" \
+          -var "db_name=${{ secrets.PSQL_DBNAME }}" \
+          -var "ami_description=${{ secrets.AMI_DESCRIPTION }}" \
+          -var "ami_polling_delay=${{ secrets.AMI_POLLING_DELAY }}" \
+          -var "ami_polling_max_attempts=${{ secrets.AMI_POLLING_MAX_ATTEMPTS }}" \
+          -var "ami_instance_type=${{ secrets.AMI_INSTANCE_TYPE }}" \
+          -var "ami_source_ami=${{ secrets.AMI_SOURCE_AMI }}" \
+          -var "ami_ssh_username=${{ secrets.AMI_SSH_USERNAME }}" \
+          -var "ami_subnet_id=${{ secrets.AMI_SUBNET_ID }}" \
+          -var "ami_launch_device_name=${{ secrets.AMI_LAUNCH_DEVICE_NAME }}" \
+          -var "ami_launch_volume_size=${{ secrets.AMI_LAUNCH_VOLUME_SIZE }}" \
+          -var "ami_launch_volume_type=${{ secrets.AMI_LAUNCH_VOLUME_TYPE }}" \
+          -var "build_ami_name=${{ secrets.BUILD_AMI_NAME }}" .
