@@ -17,14 +17,15 @@ jobs:
       - name: install postgres
         uses: ikalnytskyi/action-setup-postgres@v6
         with:
-          username: ${{ secrets.PSQL_USER }}
-          password: ${{ secrets.PSQL_PASS }}
-          database: ${{ secrets.PSQL_DBNAME }}
+          username: ci
+          password: sw0rdfish
+          database: test
           port: 5432
         id: postgres
       - name: integration test
         run: npm test
         env:
+          POSTGRES_HOST: localhost
           PSQL_USER: ${{ secrets.PSQL_USER }}
           PSQL_PASS: ${{ secrets.PSQL_PASS }}
           PSQL_DBNAME: ${{ secrets.PSQL_DBNAME }}
