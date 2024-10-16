@@ -1,9 +1,11 @@
-name: Packer check workflow
+name: Packer build workflow
 on:
   pull_request:
-    branches: [main]
+    types:
+      - closed
 jobs:
-  packer-check:
+  packer-build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository

@@ -1,8 +1,7 @@
 name: Packer check workflow
 on:
   pull_request:
-    types:
-      - closed
+    branches: [main]
 jobs:
   packer-build:
     if: github.event.pull_request.merged == true
