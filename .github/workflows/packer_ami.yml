@@ -66,7 +66,7 @@ jobs:
         run: packer validate .
       - name: packer build
         run: |
-          packer build \
+          packer build . \
           -var "aws_region=${{ secrets.AWS_REGION }}" \
           -var "db_user=${{ secrets.PSQL_USER }}" \
           -var "db_pass=${{ secrets.PSQL_PASS }}" \
@@ -83,4 +83,4 @@ jobs:
           -var "ami_launch_volume_type=${{ secrets.AMI_LAUNCH_VOLUME_TYPE }}" \
           -var "build_ami_name=${{ secrets.BUILD_AMI_NAME }}" \
           -var "ami_user_1=${{ secrets.AMI_USER_1 }}" \
-          -var "ami_user_2=${{ secrets.AMI_USER_2 }}".
+          -var "ami_user_2=${{ secrets.AMI_USER_2 }}"
