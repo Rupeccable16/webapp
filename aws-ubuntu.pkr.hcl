@@ -68,10 +68,10 @@ variable "build_ami_name" {
   default = "learn-packer"
 }
 variable "ami_user_1" {
-  type    = string
+  type = string
 }
 variable "ami_user_2" {
-  type    = string
+  type = string
 }
 
 
