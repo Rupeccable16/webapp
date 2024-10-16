@@ -5,10 +5,10 @@
 # apt upgrade -y
 
 echo "Installing unzip"
-apt install unzip
+sudo apt install unzip
 
 echo "Unzipping webapp"
-sudo unzip /tmp/webapp.zip -d /opt/webapp
+sudo unzip /tmp/webapp.zip -d /opt/webapp/
 
 echo "Setup postgres"
 sudo apt install postgresql postgresql-contrib -y
@@ -17,7 +17,7 @@ sudo systemctl enable postgresql
 
 #Make sure .env doesnt have any spacing before and after = sign
 #The following line loads env vars
-if [ -f .env ]; then     export $(grep -v '^#' .env | xargs); fi
+#if [ -f /opt/webapp/.env ]; then     export $(grep -v '^#' .env | xargs); fi
 
 echo "Set up psql user, pass and db"
 sudo -u postgres psql <<EOF
