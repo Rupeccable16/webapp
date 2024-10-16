@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+      - name: create .env
+        run: |
+          echo "${{ secrets.ENV_VARS }}" > .env
       - name: setup node
         uses: actions/setup-node@v2
         with:
