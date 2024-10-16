@@ -1,15 +1,14 @@
 #!/bin/bash
 
-echo "Update and Upgrade"
-apt update
-apt upgrade -y
+# echo "Update and Upgrade"
+# apt update
+# apt upgrade -y
 
 echo "Installing unzip"
-apt install unzip
+sudo apt install unzip
 
-#cd /tmp
-#unzip webapp.zip
-#unzip env.zip
+echo "Unzipping webapp"
+sudo unzip /tmp/webapp.zip -d /opt/webapp/
 
 echo "Setup postgres"
 sudo apt install postgresql postgresql-contrib -y
@@ -18,7 +17,7 @@ sudo systemctl enable postgresql
 
 #Make sure .env doesnt have any spacing before and after = sign
 #The following line loads env vars
-if [ -f .env ]; then     export $(grep -v '^#' .env | xargs); fi
+#if [ -f /opt/webapp/.env ]; then     export $(grep -v '^#' .env | xargs); fi
 
 echo "Set up psql user, pass and db"
 sudo -u postgres psql <<EOF
@@ -36,10 +35,21 @@ sudo sed -i 's/^host\s\+all\s\+all\s\+::1\/128\s\+scram-sha-256/host    all     
 echo "Restart postgres"
 sudo systemctl restart postgresql
 
+ls -al
+
+echo "Changing Ownership"
+sudo chown -R csye6225:csye6225 "/opt/webapp/"
+sudo chmod -R 755 /opt/webapp
+
+ls -al
+
 echo "Installing node"
-apt install nodejs -y
+sudo apt install nodejs -y
 echo "Installing npm"
-apt install npm -y
+sudo apt install npm -y
 
 echo "Installing dependencies"
-npm i
+cd /opt/webapp/
+sudo npm i
+
+echo "Setup done"
