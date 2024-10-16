@@ -81,4 +81,6 @@ jobs:
           -var "ami_launch_device_name=${{ secrets.AMI_LAUNCH_DEVICE_NAME }}" \
           -var "ami_launch_volume_size=${{ secrets.AMI_LAUNCH_VOLUME_SIZE }}" \
           -var "ami_launch_volume_type=${{ secrets.AMI_LAUNCH_VOLUME_TYPE }}" \
-          -var "build_ami_name=${{ secrets.BUILD_AMI_NAME }}" .
+          -var "build_ami_name=${{ secrets.BUILD_AMI_NAME }}" \
+          -var "ami_user_1=${{ secrets.AMI_USER_1 }}" \
+          -var "ami_user_2=${{ secrets.AMI_USER_2 }}".
