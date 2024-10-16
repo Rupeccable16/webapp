@@ -25,7 +25,6 @@ jobs:
       - name: integration test
         run: npm test
         env:
-          POSTGRES_HOST: localhost
           PSQL_USER: ${{ secrets.PSQL_USER }}
           PSQL_PASS: ${{ secrets.PSQL_PASS }}
           PSQL_DBNAME: ${{ secrets.PSQL_DBNAME }}
