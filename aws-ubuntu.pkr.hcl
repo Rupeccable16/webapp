@@ -82,7 +82,7 @@ source "amazon-ebs" "ubuntu" {
   region          = "${var.aws_region}"
   ami_name        = "csye6225_app_${formatdate("YYYY_MM_DD-hhmmss", timestamp())}"
   ami_description = "${var.ami_description}"
-  ami_users = ["${var.ami_user_1}","${var.ami_user_2}"]
+  ami_users       = ["${var.ami_user_1}", "${var.ami_user_2}"]
 
   ami_regions = [
     "${var.aws_region}",
