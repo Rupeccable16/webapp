@@ -69,11 +69,9 @@ variable "build_ami_name" {
 }
 variable "ami_user_1" {
   type    = string
-  default = ""
 }
 variable "ami_user_2" {
   type    = string
-  default = ""
 }
 
 
