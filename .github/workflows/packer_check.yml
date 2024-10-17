@@ -23,8 +23,6 @@ jobs:
         run: packer fmt -check -recursive .
       - name: create variables.pkrvars.hcl
         run: |
-          cat <<EOF > variables.pkrvars.hcl
-          ${{ secrets.PKR_VARS }}
-          EOF 
+          echo "${{ secrets.PKR_VARS }}" > variables.pkrvars.hcl
       - name: packer validate
         run: packer validate .
