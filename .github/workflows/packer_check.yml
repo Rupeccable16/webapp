@@ -19,6 +19,11 @@ jobs:
           zip -r webapp.zip . -x ".git/*" ".github/*"
       - name: packer init
         run: packer init .
+      - name: create variables.pkrvars.hcl
+        run: |
+          cat <<EOF > variables.pkrvars.hcl
+          ${{ secrets.PKR_VARS }}
+          EOF 
       - name: packer fmt
         run: packer fmt -check -recursive .
       - name: packer validate
