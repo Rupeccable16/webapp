@@ -77,7 +77,6 @@ variable "ami_user_2" {
 }
 
 
-
 source "amazon-ebs" "ubuntu" {
   region          = "${var.aws_region}"
   ami_name        = "csye6225_app_${formatdate("YYYY_MM_DD-hhmmss", timestamp())}"
