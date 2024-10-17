@@ -9,23 +9,23 @@ packer {
 
 variable "aws_region" {
   type    = string
-  default = "us-east-2"
+  default = ""
 }
 variable "db_user" {
   type    = string
-  default = "rupes"
+  default = ""
 }
 variable "db_pass" {
   type    = string
-  default = "abcd"
+  default = ""
 }
 variable "db_name" {
   type    = string
-  default = "testdb"
+  default = ""
 }
 variable "ami_description" {
   type    = string
-  default = "AMI for Assignment 04"
+  default = ""
 }
 variable "ami_polling_delay" {
   type    = number
@@ -37,23 +37,23 @@ variable "ami_polling_max_attempts" {
 }
 variable "ami_instance_type" {
   type    = string
-  default = "t2.small"
+  default = ""
 }
 variable "ami_source_ami" {
   type    = string
-  default = "ami-0866a3c8686eaeeba"
+  default = ""
 }
 variable "ami_ssh_username" {
   type    = string
-  default = "ubuntu"
+  default = ""
 }
 variable "ami_subnet_id" {
   type    = string
-  default = "subnet-0e11e5baa90d9d2b0"
+  default = ""
 }
 variable "ami_launch_device_name" {
   type    = string
-  default = "/dev/sda1"
+  default = ""
 }
 variable "ami_launch_volume_size" {
   type    = number
@@ -61,21 +61,20 @@ variable "ami_launch_volume_size" {
 }
 variable "ami_launch_volume_type" {
   type    = string
-  default = "gp2"
+  default = ""
 }
 variable "build_ami_name" {
   type    = string
-  default = "learn-packer"
+  default = ""
 }
 variable "ami_user_1" {
   type    = string
-  default = "597088036798"
+  default = ""
 }
 variable "ami_user_2" {
   type    = string
-  default = "209479307750"
+  default = ""
 }
-
 
 
 source "amazon-ebs" "ubuntu" {

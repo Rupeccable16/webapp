@@ -21,5 +21,8 @@ jobs:
         run: packer init .
       - name: packer fmt
         run: packer fmt -check -recursive .
+      - name: create variables.pkrvars.hcl
+        run: |
+          echo "${{ secrets.PKR_VARS }}" > variables.pkrvars.hcl
       - name: packer validate
-        run: packer validate .
+        run: packer validate -var-file=variables.pkrvars.hcl .
