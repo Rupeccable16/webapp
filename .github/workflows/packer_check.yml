@@ -25,4 +25,4 @@ jobs:
         run: |
           echo "${{ secrets.PKR_VARS }}" > variables.pkrvars.hcl
       - name: packer validate
-        run: packer validate .
+        run: packer validate -var-file=variables.pkrvars.hcl .
