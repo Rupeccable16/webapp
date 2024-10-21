@@ -87,7 +87,7 @@ source "amazon-ebs" "ubuntu" {
     "${var.aws_region}",
   ]
   aws_polling {
-    delay_seconds = "${var.ami_polling_delay}"
+    delay_seconds =     "${var.ami_polling_delay}"
     max_attempts  = "${var.ami_polling_max_attempts}"
   }
 
