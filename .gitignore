@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 *.pkrvars.hcl
+
+webapp.zip
