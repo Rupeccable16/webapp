@@ -1,6 +1,6 @@
 [Unit]
 Description=CSYE 6225 App
-After=network.target /opt/webapp/.env
+After=network.target
 
 [Service]
 Type=simple
