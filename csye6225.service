@@ -1,15 +1,16 @@
 [Unit]
 Description=CSYE 6225 App
-ConditionPathExists=/opt/webapp/.env
-After=network.target
+After=network.target /opt/webapp/.env
 
 [Service]
 Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt/webapp/
+ExecStartPre=/bin/bash -c 'while ! grep -q "Running command \[\'/var/lib/cloud/instance/scripts/part-001\'\] with allowed return codes \[0\]" /var/log/cloud-init.log; do sleep 5; done'
 ExecStart=/usr/bin/node /opt/webapp/server.js
 Restart=on-failure
+TimeoutStartSec=400
 
 [Install]
 WantedBy=multi-user.target
