@@ -10,7 +10,6 @@ WorkingDirectory=/opt/webapp/
 ExecStartPre=/bin/bash -c 'while [ ! -f /opt/webapp/.env ]; do sleep 3; done'
 ExecStart=/usr/bin/node /opt/webapp/server.js
 Restart=on-failure
-TimeoutStartSec=400
 
 [Install]
 WantedBy=multi-user.target
