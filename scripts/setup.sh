@@ -37,6 +37,9 @@ sudo unzip /tmp/webapp.zip -d /opt/webapp/
 
 # ls -al
 
+echo "Installing postgres drive"
+sudo npm i pg
+
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
 sudo chmod -R 755 /opt/webapp
