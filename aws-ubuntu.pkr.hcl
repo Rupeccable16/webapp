@@ -127,10 +127,10 @@ build {
     script = "scripts/app_dir_setup.sh"
   }
 
-  // provisioner "file"{ #For assignment 5 onwards
-  //   source = "app.properties"
-  //   destination = "/tmp/app.properties"
-  // }
+  provisioner "file" { #For assignment 5 onwards
+    source      = ".env"
+    destination = "/tmp/.env"
+  }
 
   provisioner "file" {
     source      = "webapp.zip"
