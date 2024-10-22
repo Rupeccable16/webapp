@@ -4,7 +4,7 @@ const {testDbConnection} = require('../db');
 exports.healthz = async (req,res) => {
     
     //Cache control set to no cache
-    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
     //Reject non "get" request
     if (req.method != "GET"){
