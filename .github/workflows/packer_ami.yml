@@ -52,7 +52,7 @@ jobs:
       - name: Zip webapp
         run: |
           [ -e webapp.zip] && rm -rf webapp.zip
-          zip -r webapp.zip . -x ".git/*" ".github/* ".env"
+          zip -r webapp.zip . -x ".git/*" ".github/*" ".env"
       - name: create variables.pkrvars.hcl
         run: |
           echo "${{ secrets.PKR_VARS }}" > variables.pkrvars.hcl      
