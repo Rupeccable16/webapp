@@ -37,10 +37,6 @@ sudo unzip /tmp/webapp.zip -d /opt/webapp/
 
 # ls -al
 
-echo "Changing Ownership"
-sudo chown -R csye6225:csye6225 "/opt/webapp/"
-sudo chmod -R 755 /opt/webapp
-
 ls -al
 
 echo "Installing node"
@@ -51,5 +47,9 @@ sudo apt install npm -y
 echo "Installing dependencies"
 cd /opt/webapp/
 sudo npm i
+
+echo "Changing Ownership"
+sudo chown -R csye6225:csye6225 "/opt/webapp/"
+sudo chmod -R 755 /opt/webapp
 
 echo "Setup done"
