@@ -5,6 +5,7 @@ const {User} = require('../Models/userModel');
 const {sequelize, testDbConnection} = require('../db');
 
 beforeAll(async() => {
+    console
     await sequelize.sync({force:true}).then(console.log('Synced inside test'));
 })
 
@@ -66,5 +67,5 @@ afterAll(async() => {
     });
     await sequelize.close()
     console.log('Closed Sequelize');
-    server.close();
+    await server.close();
 })
