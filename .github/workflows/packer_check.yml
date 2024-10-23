@@ -16,7 +16,10 @@ jobs:
       - name: Zip webapp
         run: |
           [ -e webapp.zip] && rm -rf webapp.zip
-          zip -r webapp.zip . -x ".git/*" ".github/*"
+          zip -r webapp.zip . -x ".git/*" ".github/*" ".env"
+      - name: create .env
+        run: |
+          echo "${{ secrets.ENV_VARS }}" > .env
       - name: packer init
         run: packer init .
       - name: packer fmt
