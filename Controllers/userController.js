@@ -265,6 +265,22 @@ exports.processPicRequest = async (req, res) => {
         return res.status(400).send();
       }
     } else if (req.method === "GET") {
+      //console.log('Here')
+      if (req.headers["content-length"]) {
+        return res.status(400).send();
+      }
+
+      const authorized_user = req.user.dataValues;
+      //console.log(authorized_user);
+      const found_user = await Images.findOne({
+        where: { user_id: authorized_user.id },
+      });
+      console.log(found_user)
+      if (!found_user){return res.status(404).send()}
+      else{
+        return res.status(200).send(found_user);
+      } 
+
       //Search associated user's id in the images table, retrieve image from S3(recheck in requirements), send to user
     } else if (req.method === "DELETE") {
       //Reach s3, hard delete from s3, remove entire entry from
