@@ -3,6 +3,7 @@ on:
   pull_request:
     types:
       - closed
+  push:
     branches:
       - a05-demo
 jobs:
