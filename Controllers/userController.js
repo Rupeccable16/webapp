@@ -1,7 +1,8 @@
 const { sequelize } = require("../db");
-const { User } = require("../Models/userModel");
+const { User, Images } = require("../Models/userModel");
 const app = require("../index");
 const bcrypt = require("bcrypt");
+const { UploadFile, GetPreSignedUrl } = require("../awsS3Connect");
 const saltRounds = 10;
 
 exports.createUser = async (req, res) => {
@@ -196,15 +197,64 @@ exports.handleUserRequest = async (req, res) => {
 };
 
 exports.processPicRequest = async (req, res) => {
-  console.log("end point /v1/user/self/pic");
+ // console.log("req headers", req.headers['content-type']);
+  //res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   try {
     if (req.method === "POST") {
+      console.log(req.files.length);
+      if (!(req.headers['content-type'] && req.headers['content-type'].startsWith('multipart/form-data'))) {
+        return res.status(400).send();
+      }
+      
+      if (
+        req.files &&
+        req.files.length === 1 &&
+        req.files[0].fieldname === "profilePic" &&
+        ["image/jpeg", "image/jpg", "image/png"].includes(req.files[0].mimetype)
+      ) {
+        const authorized_user = req.user.dataValues;
+        //console.log(req.files[0]);
+        const found_user = await Images.findOne({ where: { user_id: authorized_user.id } }) 
+        //console.log("found user having an image uploaded already" ,found_user);
+        if (found_user){ return res.status(400).send()}
+        
+
+        let extension = ""
+        if (req.files[0].mimetype === 'image/jpeg') { extension="jpeg" } 
+        else if (req.files[0].mimetype === 'image/png') { extension="png" }
+        else {extension="jpg"}
+        const contentType = "image/" +extension
+        const contentDisposition = "inline"
+        const reply = await UploadFile(req.files[0].buffer,contentType, contentDisposition,authorized_user.id + "/image." + extension)
+        //console.log('S3 Bucket REPLY' ,reply)
+        const getUrlReply = await GetPreSignedUrl(authorized_user.id + "/image." + extension);
+        //console.log(getUrlReply);
+
+        const new_user = await Images.create({
+          file_name: "image." + extension,
+          url: getUrlReply,
+          user_id: authorized_user.id
+        });
+
+        //return proper values, 
+        const responseToRequest = {
+          new_user
+        }
+        return res.status(201).send(responseToRequest);
+        //add another check in the above if to see if the user already has a profile pic
+
+      } else {
+        return res.status(400).send();
+      }
     } else if (req.method === "GET") {
+      //Search associated user's id in the images table, retrieve image from S3(recheck in requirements), send to user
     } else if (req.method === "DELETE") {
+      //Reach s3, hard delete from s3, remove entire entry from 
     } else {
       return res.status(405).send();
     }
   } catch (err) {
+    console.log('Facing err', err)
     return res.status(400).send();
   }
 };
