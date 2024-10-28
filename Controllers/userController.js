@@ -275,15 +275,19 @@ exports.processPicRequest = async (req, res) => {
       const found_user = await Images.findOne({
         where: { user_id: authorized_user.id },
       });
-      console.log(found_user)
-      if (!found_user){return res.status(404).send()}
-      else{
+      console.log(found_user);
+      if (!found_user) {
+        return res.status(404).send();
+      } else {
         return res.status(200).send(found_user);
-      } 
+      }
 
       //Search associated user's id in the images table, retrieve image from S3(recheck in requirements), send to user
     } else if (req.method === "DELETE") {
-      //Reach s3, hard delete from s3, remove entire entry from
+        //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html - for deleting
+      //Reach s3, 
+      //hard delete from s3, 
+      //remove entire entry from
     } else {
       return res.status(405).send();
     }
