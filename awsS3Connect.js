@@ -7,7 +7,7 @@ const {
   PutObjectCommand,
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
-const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const fs = require("fs");
 
 const bucketName = process.env.AWS_BUCKET_NAME;
@@ -24,12 +24,12 @@ const s3 = new S3Client({
 });
 
 async function getPreSignedUrl(key) {
-    const command = new GetObjectCommand({
-        Bucket: bucketName,
-        Key: key,
-        });
-    
-        return await getSignedUrl(s3,command,{expiresIn: 3600});
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+  });
+
+  return await getSignedUrl(s3, command, { expiresIn: 3600 });
 }
 
 async function uploadFile(file, contentType, contentDisposition, key) {
