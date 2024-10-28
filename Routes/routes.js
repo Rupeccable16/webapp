@@ -20,6 +20,7 @@ router.use(jsonErrorHandler);
 router.all('/healthz',healthzController.healthz);
 router.all('/v1/user',userController.createUser);
 router.all('/v1/user/self', basicAuth.authorize, userController.handleUserRequest);
+router.all('/v1/user/self/pic',basicAuth.authorize,userController.processPicRequest)
 //router.all('/v1/user/self', basicAuth.authorize, userController.handleUserRequest);
 
 

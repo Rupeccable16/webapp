@@ -5,17 +5,16 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.createUser = async (req, res) => {
-
   //Cache control set to no cache
   res.setHeader("Cache-Control", "no-cache");
-  
+
   if (req.method != "POST") {
     return res.status(405).send();
   }
 
   const { first_name, last_name, email, password } = req.body;
 
-  if (!first_name || !last_name || !password || !email || password.length<3) {
+  if (!first_name || !last_name || !password || !email || password.length < 3) {
     return res.status(400).send();
   }
 
@@ -97,12 +96,12 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.handleUserRequest = async (req, res) => {
+  console.log("end point /v1/user/self");
   try {
     //Cache control set to no cache
     res.setHeader("Cache-Control", "no-cache");
 
     if (req.method === "GET") {
-
       //No params
       if (req.headers["content-length"]) {
         return res.status(400).send();
@@ -121,9 +120,7 @@ exports.handleUserRequest = async (req, res) => {
       };
 
       return res.status(200).send(userResponse);
-
-    } 
-    else if (req.method === "PUT") {
+    } else if (req.method === "PUT") {
       //Update user function
       const user = req.user.dataValues;
 
@@ -138,7 +135,7 @@ exports.handleUserRequest = async (req, res) => {
           flag = true;
         }
       });
-      
+
       if (!flag || !req.body) {
         return res.status(400).send();
       }
@@ -148,7 +145,7 @@ exports.handleUserRequest = async (req, res) => {
       let allFieldsSame = true;
 
       if (password) {
-        if (!bcrypt.compareSync(password,user.password)) {
+        if (!bcrypt.compareSync(password, user.password)) {
           allFieldsSame = false;
         }
       }
@@ -158,20 +155,20 @@ exports.handleUserRequest = async (req, res) => {
           allFieldsSame = false;
         }
       }
-      
+
       if (last_name) {
         if (last_name != user.last_name) {
           allFieldsSame = false;
         }
       }
 
-      if(allFieldsSame){
-        console.log("All fields same")
+      if (allFieldsSame) {
+        console.log("All fields same");
         return res.status(204).send();
       }
 
       if (password) {
-        if (password.length<3) {
+        if (password.length < 3) {
           return res.status(400).send();
         }
         password = await bcrypt.hashSync(password, saltRounds);
@@ -194,6 +191,20 @@ exports.handleUserRequest = async (req, res) => {
     }
   } catch (err) {
     console.log("Catch block of userController.handleRequest", err);
+    return res.status(400).send();
+  }
+};
+
+exports.processPicRequest = async (req, res) => {
+  console.log("end point /v1/user/self/pic");
+  try {
+    if (req.method === "POST") {
+    } else if (req.method === "GET") {
+    } else if (req.method === "DELETE") {
+    } else {
+      return res.status(405).send();
+    }
+  } catch (err) {
     return res.status(400).send();
   }
 };
