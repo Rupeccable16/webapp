@@ -3,6 +3,8 @@ on:
   pull_request:
     types:
       - closed
+    branches:
+      - a05-demo
 jobs:
   packer-build:
     if: github.event.pull_request.merged == true
