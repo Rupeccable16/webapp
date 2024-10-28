@@ -6,6 +6,7 @@ const {
   HeadObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
+  waitUntilObjectNotExists,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const fs = require("fs");
@@ -29,7 +30,7 @@ async function getPreSignedUrl(key) {
     Key: key,
   });
 
-  return await getSignedUrl(s3, command, { expiresIn: 3600 });
+  return await getSignedUrl(s3, command, { expiresIn: 36000 });
 }
 
 async function uploadFile(file, contentType, contentDisposition, key) {
@@ -61,5 +62,25 @@ async function uploadFile(file, contentType, contentDisposition, key) {
   }
 }
 
+async function deleteObject(key) {
+  try {
+    const command = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    const reply = await s3.send(command);
+    console.log("Sent command", reply);
+    // const reply2 = await waitUntilObjectNotExists({s3}, {
+    //   Bucket: bucketName, Key: key
+    // },)
+    return reply;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
+
 exports.UploadFile = uploadFile;
 exports.GetPreSignedUrl = getPreSignedUrl;
+exports.DeleteObject = deleteObject;

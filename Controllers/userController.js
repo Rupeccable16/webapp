@@ -2,7 +2,11 @@ const { sequelize } = require("../db");
 const { User, Images } = require("../Models/userModel");
 const app = require("../index");
 const bcrypt = require("bcrypt");
-const { UploadFile, GetPreSignedUrl } = require("../awsS3Connect");
+const {
+  UploadFile,
+  GetPreSignedUrl,
+  DeleteObject,
+} = require("../awsS3Connect");
 const saltRounds = 10;
 
 exports.createUser = async (req, res) => {
@@ -201,7 +205,7 @@ exports.processPicRequest = async (req, res) => {
   //res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   try {
     if (req.method === "POST") {
-      console.log(req.files.length);
+      //console.log(req.files.length);
       if (
         !(
           req.headers["content-type"] &&
@@ -275,7 +279,7 @@ exports.processPicRequest = async (req, res) => {
       const found_user = await Images.findOne({
         where: { user_id: authorized_user.id },
       });
-      console.log(found_user);
+      //console.log(found_user);
       if (!found_user) {
         return res.status(404).send();
       } else {
@@ -284,10 +288,34 @@ exports.processPicRequest = async (req, res) => {
 
       //Search associated user's id in the images table, retrieve image from S3(recheck in requirements), send to user
     } else if (req.method === "DELETE") {
-        //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html - for deleting
-      //Reach s3, 
-      //hard delete from s3, 
+      //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html - for deleting
+      //Reach s3,
+      if (req.headers["content-length"]) {
+        return res.status(400).send();
+      }
+      const authorized_user = req.user.dataValues;
+      const found_user = await Images.findOne({
+        where: { user_id: authorized_user.id },
+      });
+      if (!found_user) {
+        return res.status(404).send();
+      }
+
+      const key = found_user.user_id + "/" + found_user.file_name;
+      //console.log('Constructing key', key);
+      const s3Reply = await DeleteObject(key);
+      //console.log(s3Reply);
+      const rdsReply = await Images.destroy({
+        where: {
+          user_id: authorized_user.id,
+        },
+      });
+
+      //console.log("rds reply", rdsReply);
+
+      //hard delete from s3,
       //remove entire entry from
+      return res.status(204).send();
     } else {
       return res.status(405).send();
     }
