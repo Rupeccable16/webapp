@@ -3,9 +3,15 @@ on:
   pull_request:
     types:
       - closed
+  push:
+    branches:
+      - a06-01
+      - main
 jobs:
   packer-build:
-    if: github.event.pull_request.merged == true
+    if: |
+      github.event.pull_request.merged == true ||
+      contains(github.ref, 'refs/heads/a06-01')
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
