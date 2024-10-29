@@ -18,10 +18,6 @@ const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
 const s3 = new S3Client({
   region: region,
-  credentials: {
-    accessKeyId: accessKeyId,
-    secretAccessKey: secretAccessKey,
-  },
 });
 
 async function getPreSignedUrl(key) {
