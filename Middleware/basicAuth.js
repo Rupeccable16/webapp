@@ -2,18 +2,26 @@ const bcrypt = require("bcrypt");
 const { User } = require("../Models/userModel");
 const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage()}).any();
+const {logger,sendMetric} = require("../logger");
 
 exports.uploadFile = (req, res, next) => {
   upload(req, res, (err) => {
+    const startTime = req.startTime
     if (err instanceof multer.MulterError) {
       // Handle Multer specific errors
       logger.logError(req.method,req.url,'Facing err'+err);
       console.log('Multer error:', err);
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(400).json({ error: 'Multer error occurred during upload.' });
     } else if (err) {
       logger.logError(req.method,req.url,'Facing err'+err);
       // Handle other errors
       console.log('Some other error:', err);
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(500).json({ error: 'An unknown error occurred during upload.' });
     } 
     
@@ -23,6 +31,10 @@ exports.uploadFile = (req, res, next) => {
 };
 
 exports.authorize = async (req, res, next) => {
+  const startTime = Date.now();
+  //Count increment
+  sendMetric("APICallCount", 1, req.url, req.method, "Count");
+
   //Reject requests with no headers or wrong request type
   console.log("Processing basic auth")
   if (
@@ -30,6 +42,9 @@ exports.authorize = async (req, res, next) => {
     req.headers.authorization.indexOf("Basic") === -1
   ) {
     logger.logError(req.method,req.url,'Unauthorized token');
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(401).send();
   }
 
@@ -41,6 +56,9 @@ exports.authorize = async (req, res, next) => {
   if (!user){
     logger.logError(req.method,req.url,'Unauthorized token');
     console.log("Unauthorized User Token");
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(401).send(); //Unauthorized access
   }
   const passAuth = await bcrypt.compareSync(password, user.password);
@@ -49,10 +67,14 @@ exports.authorize = async (req, res, next) => {
     req.user = user;
     console.log("Confirmed User Token");
     logger.logInfo(req.method,req.url,'Authorized token');
+    req.startTime = startTime
     next();
   } else {
     logger.logError(req.method,req.url,'Unauthorized token');
     console.log("Unauthorized User token");
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(401).send(); //Unauthorized access
   }
 };

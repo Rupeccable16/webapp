@@ -1,5 +1,5 @@
 const app = require('./index');
-const logger = require('./logger');
+const {logger,sendMetric} = require('./logger');
 
 const port = process.env.PORT;
 

@@ -1,9 +1,10 @@
 const {testDbConnection} = require('../db');
-const logger = require('../logger');
+const {logger,sendMetric} = require('../logger');
 
 
 exports.healthz = async (req,res) => {
-    
+    const startTime = Date.now();
+    sendMetric("APICallCount", 1, req.url, req.method, "Count");
     
     //Cache control set to no cache
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -12,6 +13,9 @@ exports.healthz = async (req,res) => {
     //Reject non "get" request
     if (req.method != "GET"){
         logger.logError(req.method,req.url,'Facing invalid method for api request');
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         res.status(405).send();
     }
 
@@ -22,6 +26,9 @@ exports.healthz = async (req,res) => {
         )
     ) {
         logger.logError(req.method,req.url,'Facing invalid body for api request');
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         res.status(400).send();
     }
 
@@ -31,13 +38,22 @@ exports.healthz = async (req,res) => {
 
         if (reply){
             logger.logInfo(req.method,req.url,'Successful API request');
+
+            const timeDuration = Date.now() - startTime;
+            sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
             res.status(200).send();
         } else{
             logger.logError(req.method,req.url,'DB unavailable for api request');
+
+            const timeDuration = Date.now() - startTime;
+            sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
             res.status(503).send();
         }
     } else{
         logger.logError(req.method,req.url,'Facing invalid body/headers for api request');
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         res.status(400).send();
     }
 }

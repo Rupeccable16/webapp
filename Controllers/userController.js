@@ -2,26 +2,40 @@ const { sequelize } = require("../db");
 const { User, Images } = require("../Models/userModel");
 const app = require("../index");
 const bcrypt = require("bcrypt");
-const logger = require('../logger');
+const { logger, sendMetric } = require("../logger");
 const {
   UploadFile,
   GetPreSignedUrl,
   DeleteObject,
 } = require("../awsS3Connect");
+const { DATE } = require("sequelize");
 const saltRounds = 10;
 
 exports.createUser = async (req, res) => {
+  //Increment APICount
+  const startTime = Date.now();
+  sendMetric("APICallCount", 1, req.url, req.method, "Count");
+
   //Cache control set to no cache
   res.setHeader("Cache-Control", "no-cache");
 
   if (req.method != "POST") {
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(405).send();
   }
 
   const { first_name, last_name, email, password } = req.body;
 
   if (!first_name || !last_name || !password || !email || password.length < 3) {
-    logger.logError(req.method,req.url,'Facing invalid form body for api request');
+    logger.logError(
+      req.method,
+      req.url,
+      "Facing invalid form body for api request"
+    );
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(400).send();
   }
 
@@ -29,8 +43,11 @@ exports.createUser = async (req, res) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (emailExists || !emailRegex.test(email)) {
-    logger.logWarn(req.method,req.url,'User already exists');
+    logger.logWarn(req.method, req.url, "User already exists");
     console.log("User already exists");
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(400).send();
   }
 
@@ -46,7 +63,10 @@ exports.createUser = async (req, res) => {
   const userResponse = new_user.toJSON();
   delete userResponse.password;
 
-  logger.logInfo(req.method,req.url,'Successful API request');
+  logger.logInfo(req.method, req.url, "Successful API request");
+
+  const timeDuration = Date.now() - startTime;
+  sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
   return res.status(201).send(userResponse);
 };
 
@@ -105,6 +125,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.handleUserRequest = async (req, res) => {
+  const startTime = req.startTime;
   console.log("end point /v1/user/self");
   try {
     //Cache control set to no cache
@@ -113,7 +134,14 @@ exports.handleUserRequest = async (req, res) => {
     if (req.method === "GET") {
       //No params
       if (req.headers["content-length"]) {
-        logger.logError(req.method,req.url,'Facing invalid form body for api request');
+        logger.logError(
+          req.method,
+          req.url,
+          "Facing invalid form body for api request"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
 
@@ -129,7 +157,10 @@ exports.handleUserRequest = async (req, res) => {
         account_updated: user.account_updated,
       };
 
-      logger.logInfo(req.method,req.url,'Successful API request');
+      logger.logInfo(req.method, req.url, "Successful API request");
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(200).send(userResponse);
     } else if (req.method === "PUT") {
       //Update user function
@@ -148,6 +179,9 @@ exports.handleUserRequest = async (req, res) => {
       });
 
       if (!flag || !req.body) {
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
 
@@ -175,12 +209,22 @@ exports.handleUserRequest = async (req, res) => {
 
       if (allFieldsSame) {
         console.log("All fields same");
-        logger.logWarn(req.method,req.url,'User fields were not updated as they were not changed');
+        logger.logWarn(
+          req.method,
+          req.url,
+          "User fields were not updated as they were not changed"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(204).send();
       }
 
       if (password) {
         if (password.length < 3) {
+
+          const timeDuration = Date.now() - startTime;
+          sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
           return res.status(400).send();
         }
         password = await bcrypt.hashSync(password, saltRounds);
@@ -197,15 +241,28 @@ exports.handleUserRequest = async (req, res) => {
         where: { email: user.email },
       });
 
-      logger.logInfo(req.method,req.url,'Successful API request');
+      logger.logInfo(req.method, req.url, "Successful API request");
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(204).send();
     } else {
-      logger.logError(req.method,req.url,'Facing invalid method for api request');
+      logger.logError(
+        req.method,
+        req.url,
+        "Facing invalid method for api request"
+      );
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(405).send();
     }
   } catch (err) {
-    logger.logError(req.method,req.url,err);
+    logger.logError(req.method, req.url, err);
     console.log("Catch block of userController.handleRequest", err);
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(400).send();
   }
 };
@@ -214,6 +271,7 @@ exports.processPicRequest = async (req, res) => {
   // console.log("req headers", req.headers['content-type']);
   //res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   try {
+    const startTime = req.startTime
     if (req.method === "POST") {
       //console.log(req.files.length);
       if (
@@ -222,7 +280,14 @@ exports.processPicRequest = async (req, res) => {
           req.headers["content-type"].startsWith("multipart/form-data")
         )
       ) {
-        logger.logError(req.method,req.url,'Facing invalid body for api request');
+        logger.logError(
+          req.method,
+          req.url,
+          "Facing invalid body for api request"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
 
@@ -239,7 +304,10 @@ exports.processPicRequest = async (req, res) => {
         });
         //console.log("found user having an image uploaded already" ,found_user);
         if (found_user) {
-          logger.logWarn(req.method,req.url,'User already has a profile pic');
+          logger.logWarn(req.method, req.url, "User already has a profile pic");
+
+          const timeDuration = Date.now() - startTime;
+          sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
           return res.status(400).send();
         }
 
@@ -276,17 +344,34 @@ exports.processPicRequest = async (req, res) => {
           new_user,
         };
 
-        logger.logInfo(req.method,req.url,'Successful API request');
+        logger.logInfo(req.method, req.url, "Successful API request");
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(201).send(responseToRequest);
         //add another check in the above if to see if the user already has a profile pic
       } else {
-        logger.logError(req.method,req.url,'Facing invalid body for api request');
+        logger.logError(
+          req.method,
+          req.url,
+          "Facing invalid body for api request"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
     } else if (req.method === "GET") {
       //console.log('Here')
       if (req.headers["content-length"]) {
-        logger.logError(req.method,req.url,'Facing invalid body for api request');
+        logger.logError(
+          req.method,
+          req.url,
+          "Facing invalid body for api request"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
 
@@ -297,10 +382,16 @@ exports.processPicRequest = async (req, res) => {
       });
       //console.log(found_user);
       if (!found_user) {
-        logger.logError(req.method,req.url,'No such user found');
+        logger.logError(req.method, req.url, "No such user found");
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(404).send();
       } else {
-        logger.logInfo(req.method,req.url,'Successful API request');
+        logger.logInfo(req.method, req.url, "Successful API request");
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(200).send(found_user);
       }
 
@@ -309,7 +400,14 @@ exports.processPicRequest = async (req, res) => {
       //https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html - for deleting
       //Reach s3,
       if (req.headers["content-length"]) {
-        logger.logError(req.method,req.url,'Facing invalid body for api request');
+        logger.logError(
+          req.method,
+          req.url,
+          "Facing invalid body for api request"
+        );
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(400).send();
       }
       const authorized_user = req.user.dataValues;
@@ -317,7 +415,10 @@ exports.processPicRequest = async (req, res) => {
         where: { user_id: authorized_user.id },
       });
       if (!found_user) {
-        logger.logError(req.method,req.url,'No such user found');
+        logger.logError(req.method, req.url, "No such user found");
+
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(404).send();
       }
 
@@ -335,15 +436,28 @@ exports.processPicRequest = async (req, res) => {
 
       //hard delete from s3,
       //remove entire entry from
-      logger.logInfo(req.method,req.url,'Successful API request');
+      logger.logInfo(req.method, req.url, "Successful API request");
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(204).send();
     } else {
-      logger.logError(req.method,req.url,'Facing invalid method for api request');
+      logger.logError(
+        req.method,
+        req.url,
+        "Facing invalid method for api request"
+      );
+
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(405).send();
     }
   } catch (err) {
-    logger.logError(req.method,req.url,'Facing err'+err);
+    logger.logError(req.method, req.url, "Facing err" + err);
     console.log("Facing err", err);
+
+    const timeDuration = Date.now() - startTime;
+    sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
     return res.status(400).send();
   }
 };

@@ -1,4 +1,4 @@
-const logger = require('./logger');
+const {logger,sendMetric} = require('./logger');
 //Setting up express app
 const express = require('express');
 const app = express();

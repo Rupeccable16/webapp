@@ -48,6 +48,9 @@ echo "Installing dependencies"
 cd /opt/webapp/
 sudo npm i
 
+echo "Installing CloudWatch Agent"
+sudo apt install amazon-cloudwatch-agent
+
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
 sudo chmod -R 755 /opt/webapp
