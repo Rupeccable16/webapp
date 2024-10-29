@@ -51,7 +51,9 @@ exports.authorize = async (req, res, next) => {
   const base64Creds = req.headers.authorization.split(" ")[1];
   const credentials = Buffer.from(base64Creds, "base64").toString("ascii");
   const [email, password] = credentials.split(":");
+  const dbStartTime = Date.now();
   const user = await User.findOne({ where: { email: email } });
+  sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
   if (!user){
     logger.logError(req.method,req.url,'Unauthorized token');

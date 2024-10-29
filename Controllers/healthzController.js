@@ -34,7 +34,9 @@ exports.healthz = async (req,res) => {
 
     //Check for db connection
     if (!req.headers["content-length"]){  //Sanity check
+        const dbStartTime = Date.now();
         const reply = await testDbConnection();
+        sendMetric("DbConnectionLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
         if (reply){
             logger.logInfo(req.method,req.url,'Successful API request');

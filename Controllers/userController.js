@@ -39,7 +39,9 @@ exports.createUser = async (req, res) => {
     return res.status(400).send();
   }
 
+  const dbStartTime = Date.now();
   const emailExists = await User.findOne({ where: { email: email } });
+  sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (emailExists || !emailRegex.test(email)) {
@@ -53,12 +55,14 @@ exports.createUser = async (req, res) => {
 
   const hashedPass = bcrypt.hashSync(password, saltRounds);
 
+  dbStartTime = Date.now();
   const new_user = await User.create({
     first_name: first_name,
     last_name: last_name,
     email: email,
     password: hashedPass,
   });
+  sendMetric("DbCreateLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
   const userResponse = new_user.toJSON();
   delete userResponse.password;
@@ -237,9 +241,11 @@ exports.handleUserRequest = async (req, res) => {
         account_updated: sequelize.literal("CURRENT_TIMESTAMP"),
       };
 
+      const dbStartTime = Date.now();
       await User.update(updated_user, {
         where: { email: user.email },
       });
+      sendMetric("DbUpdateLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
       logger.logInfo(req.method, req.url, "Successful API request");
 
@@ -299,9 +305,12 @@ exports.processPicRequest = async (req, res) => {
       ) {
         const authorized_user = req.user.dataValues;
         //console.log(req.files[0]);
+        
+        const dbStartTime = Date.now();
         const found_user = await Images.findOne({
           where: { user_id: authorized_user.id },
         });
+        sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
         //console.log("found user having an image uploaded already" ,found_user);
         if (found_user) {
           logger.logWarn(req.method, req.url, "User already has a profile pic");
@@ -332,12 +341,14 @@ exports.processPicRequest = async (req, res) => {
           authorized_user.id + "/image." + extension
         );
         //console.log(getUrlReply);
-
+        
+        dbStartTime = Date.now();
         const new_user = await Images.create({
           file_name: "image." + extension,
           url: getUrlReply,
           user_id: authorized_user.id,
         });
+        sendMetric("DbCreateLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
         //return proper values,
         const responseToRequest = {
@@ -377,9 +388,11 @@ exports.processPicRequest = async (req, res) => {
 
       const authorized_user = req.user.dataValues;
       //console.log(authorized_user);
+      const dbStartTime = Date.now();
       const found_user = await Images.findOne({
         where: { user_id: authorized_user.id },
       });
+      sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
       //console.log(found_user);
       if (!found_user) {
         logger.logError(req.method, req.url, "No such user found");
@@ -411,9 +424,11 @@ exports.processPicRequest = async (req, res) => {
         return res.status(400).send();
       }
       const authorized_user = req.user.dataValues;
+      const dbStartTime = Date.now();
       const found_user = await Images.findOne({
         where: { user_id: authorized_user.id },
       });
+      sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
       if (!found_user) {
         logger.logError(req.method, req.url, "No such user found");
 
@@ -426,11 +441,13 @@ exports.processPicRequest = async (req, res) => {
       //console.log('Constructing key', key);
       const s3Reply = await DeleteObject(key);
       //console.log(s3Reply);
+      dbStartTime = Date.now();
       const rdsReply = await Images.destroy({
         where: {
           user_id: authorized_user.id,
         },
       });
+      sendMetric("DbDeleteLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
       //console.log("rds reply", rdsReply);
 
