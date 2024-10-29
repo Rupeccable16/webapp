@@ -7,9 +7,11 @@ exports.uploadFile = (req, res, next) => {
   upload(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       // Handle Multer specific errors
+      logger.logError(req.method,req.url,'Facing err'+err);
       console.log('Multer error:', err);
       return res.status(400).json({ error: 'Multer error occurred during upload.' });
     } else if (err) {
+      logger.logError(req.method,req.url,'Facing err'+err);
       // Handle other errors
       console.log('Some other error:', err);
       return res.status(500).json({ error: 'An unknown error occurred during upload.' });
@@ -27,6 +29,7 @@ exports.authorize = async (req, res, next) => {
     !req.headers.authorization ||
     req.headers.authorization.indexOf("Basic") === -1
   ) {
+    logger.logError(req.method,req.url,'Unauthorized token');
     return res.status(401).send();
   }
 
@@ -36,6 +39,7 @@ exports.authorize = async (req, res, next) => {
   const user = await User.findOne({ where: { email: email } });
 
   if (!user){
+    logger.logError(req.method,req.url,'Unauthorized token');
     console.log("Unauthorized User Token");
     return res.status(401).send(); //Unauthorized access
   }
@@ -44,11 +48,10 @@ exports.authorize = async (req, res, next) => {
   if (passAuth) {
     req.user = user;
     console.log("Confirmed User Token");
-    if ((req.url === '/v1/user/self/pic') && (req.method === 'POST')){
-    }
-
+    logger.logInfo(req.method,req.url,'Authorized token');
     next();
   } else {
+    logger.logError(req.method,req.url,'Unauthorized token');
     console.log("Unauthorized User token");
     return res.status(401).send(); //Unauthorized access
   }

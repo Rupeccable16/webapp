@@ -3,6 +3,7 @@ const router = express.Router();
 const healthzController = require('../Controllers/healthzController');
 const userController = require('../Controllers/userController');
 const basicAuth = require('../Middleware/basicAuth');
+const logger = require('../logger');
 // const multer = require('multer');
 // const storage = multer.memoryStorage();
 // const upload = multer({storage: storage});
@@ -11,7 +12,8 @@ const basicAuth = require('../Middleware/basicAuth');
 //Custom error handling for invalid json body
 const jsonErrorHandler = (err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-        
+        logger.logError(req.method,req.url,'Facing invalid json body for api request');
+        //logger.log('Facing invalid json body for api request')
         return res.status(400).send();  // No body
     }
     next(); 
@@ -20,6 +22,7 @@ const jsonErrorHandler = (err, req, res, next) => {
 const multerErr = function (req, res) {
     upload(req, res, function (err) {
       if (err instanceof multer.MulterError) {
+        logger.logError(req.method,req.url,'Facing invalid form body for api request');
         // A Multer error occurred when uploading.
         console.log('Caught MulterError')
       } else if (err) {

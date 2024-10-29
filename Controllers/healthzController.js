@@ -1,13 +1,17 @@
 const {testDbConnection} = require('../db');
+const logger = require('../logger');
 
 
 exports.healthz = async (req,res) => {
     
+    
     //Cache control set to no cache
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    logger.logInfo(req.method,req.url,'Setting response to no cache');
 
     //Reject non "get" request
     if (req.method != "GET"){
+        logger.logError(req.method,req.url,'Facing invalid method for api request');
         res.status(405).send();
     }
 
@@ -17,6 +21,7 @@ exports.healthz = async (req,res) => {
             req.headers["content-type"] != undefined
         )
     ) {
+        logger.logError(req.method,req.url,'Facing invalid body for api request');
         res.status(400).send();
     }
 
@@ -25,11 +30,14 @@ exports.healthz = async (req,res) => {
         const reply = await testDbConnection();
 
         if (reply){
+            logger.logInfo(req.method,req.url,'Successful API request');
             res.status(200).send();
         } else{
+            logger.logError(req.method,req.url,'DB unavailable for api request');
             res.status(503).send();
         }
     } else{
+        logger.logError(req.method,req.url,'Facing invalid body/headers for api request');
         res.status(400).send();
     }
 }
