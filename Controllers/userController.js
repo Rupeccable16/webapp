@@ -338,14 +338,14 @@ exports.processPicRequest = async (req, res) => {
           contentDisposition,
           authorized_user.id + "/image." + extension
         );
-        sendMetric("s3UploadLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
+        sendMetric("s3UploadLatency", Date.now() - s3StartTime, req.url, req.method, "Milliseconds");
 
         //console.log('S3 Bucket REPLY' ,reply)
         s3StartTime = Date.now();
         const getUrlReply = await GetPreSignedUrl(
           authorized_user.id + "/image." + extension
         );
-        sendMetric("s3UploadLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
+        sendMetric("s3UploadLatency", Date.now() - s3StartTime, req.url, req.method, "Milliseconds");
         //console.log(getUrlReply);
         
         dbStartTime = Date.now();
@@ -447,7 +447,7 @@ exports.processPicRequest = async (req, res) => {
       //console.log('Constructing key', key);
       const s3StartTime = Date.now();
       const s3Reply = await DeleteObject(key);
-      sendMetric("s3UploadLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
+      sendMetric("s3UploadLatency", Date.now() - s3StartTime, req.url, req.method, "Milliseconds");
       //console.log(s3Reply);
       dbStartTime = Date.now();
       const rdsReply = await Images.destroy({

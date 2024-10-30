@@ -3,6 +3,7 @@ const {
   CloudWatchClient,
   PutMetricDataCommand,
 } = require("@aws-sdk/client-cloudwatch");
+const StatsD = require('node-statsd');
 
 const winston = require("winston");
 require("winston-cloudwatch");
@@ -13,13 +14,14 @@ const logger = winston.createLogger({
   level: "info",
   transports: [
     new winston.transports.Console(),
-    new winston.transports.CloudWatch({
-      logGroupName: "webappLogs",
-      logStreamName: "webappStream",
-      cloudWatchLogs: new CloudWatchLogs({
-        region: region,
-      }),
-    }),
+    new winston.transports.File({ filename: '/var/log/webapp/csye6225.log'})
+    // new winston.transports.CloudWatch({
+    //   logGroupName: "webappLogs",
+    //   logStreamName: "webappStream",
+    //   cloudWatchLogs: new CloudWatchLogs({
+    //     region: region,
+    //   }),
+    // }),
   ],
 });
 
@@ -60,25 +62,36 @@ logger.logWarn = (method, endpoint, message) => {
 };
 
 //For metrics
-const client = new CloudWatchClient({ region: region });
+const client = new StatsD({host: 'localhost', port:8125});
+//const client = new CloudWatchClient({ region: region });
 
 const sendMetric = async (metricName, value, endpoint, method, unit) => {
-  const params = {
-    MetricData: [
-      {
-        MetricName: metricName,
-        Dimensions: [
-          { Name: "Endpoint", Value: endpoint },
-          { Name: "Method", Value: method },
-        ],
-        Unit: unit,
-        Value: value,
-      },
-    ],
-    Namespace: "WebAppMetrics",
-  };
-  console.log("The parameters are", params)
-  await client.send(new PutMetricDataCommand(params));
+  const metricKey = `webapp.${metricName}.${method}.${endpoint}`;
+
+  if (unit==='Milliseconds') {
+    client.timing(metricKey, value);
+  } else if (unit==='Count'){
+    client.increment(metricKey,value);
+  } else {
+    client.gauge(metricKey, value);
+  }
+  // const params = {
+  //   MetricData: [
+  //     {
+  //       MetricName: metricName,
+  //       Dimensions: [
+  //         { Name: "Endpoint", Value: endpoint },
+  //         { Name: "Method", Value: method },
+  //       ],
+  //       Unit: unit,
+  //       Value: value,
+  //     },
+  //   ],
+  //   Namespace: "WebAppMetrics",
+  // };
+  // console.log("The parameters are", params)
+  // await client.send(new PutMetricDataCommand(params));
+  console.log('sent metric to statsD', {metricKey,value})
 };
 
 module.exports = { logger, sendMetric };
