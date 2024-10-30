@@ -9,7 +9,6 @@ Group=csye6225
 WorkingDirectory=/opt/webapp/
 ExecStartPre=/bin/bash -c 'while [ ! -f /opt/webapp/.env ]; do sleep 3; done'
 ExecStart=/usr/bin/node /opt/webapp/server.js
-ExecStartPost=/bin/bash -c 'sleep 5 && sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/webapp/cloudWatchConfig/amazon-cloudwatch-agent.json -s'
 Restart=on-failure
 
 [Install]
