@@ -37,39 +37,40 @@ const logger = winston.createLogger({
 });
 
 logger.logError = (method, endpoint, message) => {
-  const structuredLog = {
-    timestamp: new Date().toISOString(),
-    level: "error",
-    method: method,
-    endpoint: endpoint,
-    message: message,
-  };
+  // const structuredLog = {
+  //   level: "error",
+  //   method: method,
+  //   endpoint: endpoint,
+  //   message: message,
+  // };
   
-  logger.error(JSON.stringify(structuredLog));
+  logger.log({level:level, method: method, endpoint: endpoint, message: message});
 };
 
 logger.logInfo = (method, endpoint, message) => {
-  const structuredLog = {
-    timestamp: new Date().toISOString(),
-    level: "info",
-    method: method,
-    endpoint: endpoint,
-    message: message,
-  };
-  console.log("logging", JSON.stringify(structuredLog))
-  logger.info(JSON.stringify(structuredLog));
+  // const structuredLog = {
+  //   timestamp: new Date().toISOString(),
+  //   level: "info",
+  //   method: method,
+  //   endpoint: endpoint,
+  //   message: message,
+  // };
+  // console.log("logging", JSON.stringify(structuredLog))
+  logger.log({level:level, method: method, endpoint: endpoint, message: message});
+  
+  //logger.info(structuredLog);
 };
 
 logger.logWarn = (method, endpoint, message) => {
-  const structuredLog = {
-    timestamp: new Date().toISOString(),
-    level: "warn",
-    method: method,
-    endpoint: endpoint,
-    message: message,
-  };
+  // const structuredLog = {
+  //   timestamp: new Date().toISOString(),
+  //   level: "warn",
+  //   method: method,
+  //   endpoint: endpoint,
+  //   message: message,
+  // };
 
-  logger.warn(JSON.stringify(structuredLog));
+  logger.log({level:level, method: method, endpoint: endpoint, message: message});
 };
 
 //For metrics
