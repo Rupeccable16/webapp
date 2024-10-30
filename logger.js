@@ -66,7 +66,10 @@ logger.logWarn = (method, endpoint, message) => {
 };
 
 //For metrics
-const client = new StatsD({host: 'localhost', port:8125});
+
+const client = new StatsD({ host: 'localhost', port: 8125 });
+
+//const client = new StatsD({host: 'localhost', port:8125});
 //const client = new CloudWatchClient({ region: region });
 
 const sendMetric = async (metricName, value, endpoint, method, unit) => {
@@ -98,4 +101,4 @@ const sendMetric = async (metricName, value, endpoint, method, unit) => {
   console.log('sent metric to statsD', {metricKey,value})
 };
 
-module.exports = { logger, sendMetric };
+module.exports = { logger, sendMetric, client };

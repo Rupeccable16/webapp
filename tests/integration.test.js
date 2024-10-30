@@ -3,6 +3,7 @@ const app = require('../index');
 const server = require('../server');
 const {User} = require('../Models/userModel');
 const {sequelize, testDbConnection} = require('../db');
+const { client } = require('../logger');
 
 beforeAll(async() => {
     await sequelize.drop();
@@ -60,12 +61,14 @@ describe("Test2 - Edit user and get user at /v1/user", () => {
 })
 
 afterAll(async() => {
-    await User.destroy({
-        where: {
-            email: postData.email
-        }
-    });
-    await sequelize.close()
-    console.log('Closed Sequelize');
-    await server.close();
+    // await User.destroy({
+    //     where: {
+    //         email: postData.email
+    //     }
+    // });
+    //sequelize.close()
+    // console.log('Closed Sequelize');
+    client.socket.close();
+    server.close();
+    
 })
