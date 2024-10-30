@@ -4,7 +4,7 @@ const {
   PutMetricDataCommand,
 } = require("@aws-sdk/client-cloudwatch");
 require('dotenv');
-environment = process.env.ENVIRONMENT || "PROD";
+const environment = process.env.TEST_CHANGE_FIRSTNAME || "PROD";
 const StatsD = require('node-statsd');
 
 const winston = require("winston");
