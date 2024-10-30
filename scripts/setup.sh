@@ -57,11 +57,12 @@ wget https://amazoncloudwatch-agent-us-east-1.s3.us-east-1.amazonaws.com/ubuntu/
 echo "Install the CloudWatch Agent"
 sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
 
-echo "Clean up the downloaded package"
-rm -f amazon-cloudwatch-agent.deb
 
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
 sudo chmod -R 755 /opt/webapp
+
+sudo chown -R csye6225:csye6225 "/var/log/webapp"
+sudo chmod -R 755 /var/log/webapp
 
 echo "Setup done"

@@ -20,9 +20,9 @@
     "metrics":{
       "metrics_collected":{
          "statsd":{
-            "service_address":":8125",
+            "service_address":"udp://localhost:8125",
             "metrics_collection_interval":15,
-            "metrics_aggregation_interval":300
+            "metrics_aggregation_interval":60
          }
       }
    }
