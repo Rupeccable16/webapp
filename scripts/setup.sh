@@ -49,7 +49,16 @@ cd /opt/webapp/
 sudo npm i
 
 echo "Installing CloudWatch Agent"
-sudo apt install amazon-cloudwatch-agent
+sudo apt-get install wget -y
+
+echo "Download the CloudWatch Agent package"
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+
+echo "Install the CloudWatch Agent"
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+
+echo "Clean up the downloaded package"
+rm -f amazon-cloudwatch-agent.deb
 
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
