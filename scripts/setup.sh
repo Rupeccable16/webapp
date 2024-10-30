@@ -7,6 +7,15 @@
 echo "Installing unzip"
 sudo apt install unzip
 
+echo "Installing CloudWatch Agent"
+sudo apt-get install wget -y
+
+echo "Download the CloudWatch Agent package"
+sudo wget https://amazoncloudwatch-agent-us-east-1.s3.us-east-1.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+
+echo "Install the CloudWatch Agent"
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+
 echo "Unzipping webapp"
 sudo unzip /tmp/webapp.zip -d /opt/webapp/
 
@@ -47,16 +56,6 @@ sudo apt install npm -y
 echo "Installing dependencies"
 cd /opt/webapp/
 sudo npm i
-
-echo "Installing CloudWatch Agent"
-sudo apt-get install wget -y
-
-echo "Download the CloudWatch Agent package"
-wget https://amazoncloudwatch-agent-us-east-1.s3.us-east-1.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-
-echo "Install the CloudWatch Agent"
-sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
-
 
 echo "Changing Ownership"
 sudo chown -R csye6225:csye6225 "/opt/webapp/"
