@@ -52,7 +52,7 @@ echo "Installing CloudWatch Agent"
 sudo apt-get install wget -y
 
 echo "Download the CloudWatch Agent package"
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+wget https://amazoncloudwatch-agent-us-east-1.s3.us-east-1.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
 
 echo "Install the CloudWatch Agent"
 sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
