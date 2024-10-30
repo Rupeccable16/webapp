@@ -7,13 +7,20 @@ require('dotenv');
 const environment = process.env.ENVIRONMENT || "PROD";
 const StatsD = require('node-statsd');
 
+
 const winston = require("winston");
 require("winston-cloudwatch");
+const {combine, timestamp, json} = winston.format;
 const region = process.env.AWS_REGION;
+
+const customFormat = json(({ level, message, method, endpoint }) => {
+  return { level,message,method,endpoint}
+});
 
 // Setup Winston to log to CloudWatch
 const logger = winston.createLogger({
-  level: "info",
+  //level: "info",
+  format: combine(timestamp({utc:true}), customFormat),
   transports: [
     environment !== "PROD" ? new winston.transports.File({ filename: 'csye6225.log'}) : 
     new winston.transports.File({ filename: '/var/log/webapp/csye6225.log'})
@@ -37,7 +44,7 @@ logger.logError = (method, endpoint, message) => {
     endpoint: endpoint,
     message: message,
   };
-
+  
   logger.error(JSON.stringify(structuredLog));
 };
 
@@ -49,7 +56,7 @@ logger.logInfo = (method, endpoint, message) => {
     endpoint: endpoint,
     message: message,
   };
-
+  console.log("logging", JSON.stringify(structuredLog))
   logger.info(JSON.stringify(structuredLog));
 };
 

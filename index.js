@@ -8,7 +8,7 @@ require('dotenv').config();
 
 //Boostrap db
 const { sequelize } = require('./db');
-sequelize.sync().then(logger.info('Sequelize SYNCED'));
+sequelize.sync().then(console.log('Sequelize SYNCED'));
 
 //Route all requests to routes.js
 const routes = require('./Routes/routes');
