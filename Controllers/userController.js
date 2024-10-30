@@ -55,14 +55,14 @@ exports.createUser = async (req, res) => {
 
   const hashedPass = bcrypt.hashSync(password, saltRounds);
 
-  dbStartTime = Date.now();
+  dbStartTime2 = Date.now();
   const new_user = await User.create({
     first_name: first_name,
     last_name: last_name,
     email: email,
     password: hashedPass,
   });
-  sendMetric("DbCreateLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
+  sendMetric("DbCreateLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
   const userResponse = new_user.toJSON();
   delete userResponse.password;
