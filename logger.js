@@ -3,7 +3,7 @@ const {
   CloudWatchClient,
   PutMetricDataCommand,
 } = require("@aws-sdk/client-cloudwatch");
-const environment = process.env.ENVIRONMENT || "PROD";
+environment = process.env.ENVIRONMENT || "PROD";
 const StatsD = require('node-statsd');
 
 const winston = require("winston");
@@ -14,7 +14,8 @@ const region = process.env.AWS_REGION;
 const logger = winston.createLogger({
   level: "info",
   transports: [
-    environment !== "PROD" ? new winston.transports.File({ filename: 'csye6225.log'}) : new winston.transports.File({ filename: '/var/log/webapp/csye6225.log'})
+    environment !== "PROD" ? new winston.transports.File({ filename: 'csye6225.log'}) : 
+    new winston.transports.File({ filename: '/var/log/webapp/csye6225.log'})
     
     
     // new winston.transports.CloudWatch({
