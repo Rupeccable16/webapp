@@ -48,4 +48,37 @@ const User = sequelize.define(
   }
 );
 
-module.exports = { User };
+const Images = sequelize.define(
+  "Images",
+  {
+    file_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
+    url: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    upload_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+      readOnly: true,
+      defaultValue: DataTypes.NOW,
+    },
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+  },
+  {
+    timestamps: false,
+  }
+);
+
+module.exports = { User, Images };
