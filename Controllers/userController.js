@@ -1,5 +1,5 @@
 const { sequelize } = require("../db");
-const { User, Images } = require("../Models/userModel");
+const { User, Images, Verification } = require("../Models/userModel");
 const app = require("../index");
 const bcrypt = require("bcrypt");
 const { logger, sendMetric } = require("../logger");
@@ -272,6 +272,40 @@ exports.handleUserRequest = async (req, res) => {
     return res.status(400).send();
   }
 };
+
+exports.handleActivation = async(req,res) => {
+  try{
+    //Validate method
+    if (req.method!='GET'){
+      return res.status(405).send();
+    }
+
+    //Extracting token
+    const {token} = req.params;
+
+    const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
+    const verification = await Verification.findOne({ where: {user_id: decoded.user_id}})
+
+    if (user){
+      if (Date.now() - verification.url_created <= verification.expire_time){
+        console.log('Verification not expired')
+
+
+        //Update the verified property of the user
+        await User.update(
+          {verified: true},
+          {where: {user_id: decoded.user_id}}
+        )
+
+      } else {
+        console.log('Verification expired');
+      }
+    }
+
+  } catch(error){
+    console.log(error);
+  }
+}
 
 exports.processPicRequest = async (req, res) => {
   // console.log("req headers", req.headers['content-type']);
