@@ -55,9 +55,9 @@ exports.authorize = async (req, res, next) => {
   const user = await User.findOne({ where: { email: email } });
   sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
-  if (!user){
+  if (!user || !user.verified){
     logger.logError(req.method,req.url,'Unauthorized token');
-    console.log("Unauthorized User Token");
+    console.log("Unauthorized/Unverified User Token");
 
     const timeDuration = Date.now() - startTime;
     sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
