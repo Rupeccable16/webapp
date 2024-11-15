@@ -10,6 +10,27 @@ const {
 } = require("../awsS3Connect");
 const { DATE } = require("sequelize");
 const saltRounds = 10;
+const AWS = require('aws-sdk');
+AWS.config.update({region: process.env.AWS_REGION})
+const sns = new AWS.SNS();
+const topicArn = process.env.TOPIC_ARN;
+
+async function publishMessage(message, messageGrpId, messageDeduplicationId) {
+  const params = {
+    Message: JSON.stringify(message),
+    TopicArn: topicArn,
+    MessageGroupId: messageGrpId,
+    MessageDeduplicationId: messageDeduplicationId
+  }
+
+  try{
+    const result = await sns.publish(params).promise();
+    console.log('Message sent successfuly', result)
+  } catch (error) {
+    console.log('Error sending message', error);
+  }
+  
+}
 
 exports.createUser = async (req, res) => {
   //Increment APICount
@@ -64,6 +85,8 @@ exports.createUser = async (req, res) => {
   });
   sendMetric("DbCreateLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
+  const curr_timestamp = Date.now();
+  publishMessage({user_id: new_user.id},`user-${new_user.id}`,`user-${new_user.id}-timestamp-${curr_timestamp}`);
   // const new_token = await Verification.create({
   //   user_id: new_user.id,
   //   url: `http://localhost:5000/v1/user/activate?token=${new_user.id}`,
