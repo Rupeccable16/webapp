@@ -64,6 +64,16 @@ exports.createUser = async (req, res) => {
   });
   sendMetric("DbCreateLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
+  // const new_token = await Verification.create({
+  //   user_id: new_user.id,
+  //   url: `http://localhost:5000/v1/user/activate?token=${new_user.id}`,
+  //   expire_time: '180000'   //in milliseconds (3 min)
+  // })
+
+  // console.log("Created new verification token object", new_token);
+
+  // console.log("Here's the url", new_token.url);
+
   const userResponse = new_user.toJSON();
   delete userResponse.password;
 
@@ -275,38 +285,62 @@ exports.handleUserRequest = async (req, res) => {
 
 exports.handleActivation = async(req,res) => {
   try{
+    const curr_time = Date.now()
     //Validate method
     if (req.method!='GET'){
       return res.status(405).send();
     }
 
     //Extracting token
-    const {token} = req.params;
+    const token = req.query.token;
 
-    const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
-    const verification = await Verification.findOne({ where: {user_id: decoded.user_id}})
+    //Handle absence of token
+    if (!token){
+      return res.status(400).send();
+    }
+
+    console.log('This is the token and req.query', token, req.query);
+
+    // const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
+    const verification = await Verification.findOne({ where: {user_id: token}})
+    const existing_user = await User.findOne({ where: {id: token}})
+
+    if (existing_user.verified) {
+      console.log('User is already verified');
+      return res.status(400).send();
+    }
+
+    console.log('Found verification entry', verification)
 
     if (verification){
-      if (Date.now() - verification.url_created <= verification.expire_time){
+      console.log('If statement calculating time using .getTime()', curr_time,verification.url_created.getTime(), curr_time - verification.url_created.getTime(), verification.expire_time);
+      if (curr_time - verification.url_created.getTime() <= verification.expire_time){
         console.log('Verification not expired')
+        
 
-
-        //Update the verified property of the user
+        //Update user to verified
         await User.update(
           {verified: true},
-          {where: {user_id: decoded.user_id}}
+          {where: {id: verification.user_id}}
         )
+        // const user = await User.findOne({ where: {id: verification.user_id}})
+        // console.log('Found updated user', user);
         return res.status(204).send();
 
+        
 
       } else {
         console.log('Verification expired');
         return res.status(410).send(); //Gone
       }
+    } else {
+      console.log('Verification entry not found')
+      return res.status(400).send();
     }
 
   } catch(error){
     console.log(error);
+    return res.status(400).send();
   }
 }
 

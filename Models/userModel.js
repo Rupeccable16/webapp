@@ -103,7 +103,7 @@ const Verification = sequelize.define(
       allowNull: false, 
     },
     url_created: {
-      type: DataTypes.TIME,
+      type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false     
     },

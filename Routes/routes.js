@@ -39,7 +39,7 @@ router.use(jsonErrorHandler);
 
 router.all('/healthz',healthzController.healthz);
 router.all('/v1/user',userController.createUser);
-router.get('/v1/user/activate/:token',)
+router.get('/v1/user/activate', userController.handleActivation);
 router.all('/v1/user/self', basicAuth.authorize, userController.handleUserRequest);
 router.post('/v1/user/self/pic',basicAuth.authorize,basicAuth.uploadFile, userController.processPicRequest)
 router.get('/v1/user/self/pic', basicAuth.authorize,userController.processPicRequest);
