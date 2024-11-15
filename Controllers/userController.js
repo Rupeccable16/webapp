@@ -286,7 +286,7 @@ exports.handleActivation = async(req,res) => {
     const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
     const verification = await Verification.findOne({ where: {user_id: decoded.user_id}})
 
-    if (user){
+    if (verification){
       if (Date.now() - verification.url_created <= verification.expire_time){
         console.log('Verification not expired')
 
@@ -296,9 +296,12 @@ exports.handleActivation = async(req,res) => {
           {verified: true},
           {where: {user_id: decoded.user_id}}
         )
+        return res.status(204).send();
+
 
       } else {
         console.log('Verification expired');
+        return res.status(410).send(); //Gone
       }
     }
 

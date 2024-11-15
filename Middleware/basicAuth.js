@@ -55,7 +55,7 @@ exports.authorize = async (req, res, next) => {
   const user = await User.findOne({ where: { email: email } });
   sendMetric("DbFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
 
-  if (!user || !user.verified){
+  if (!user){
     logger.logError(req.method,req.url,'Unauthorized token');
     console.log("Unauthorized/Unverified User Token");
 
@@ -67,6 +67,11 @@ exports.authorize = async (req, res, next) => {
 
   if (passAuth) {
     req.user = user;
+
+    if (!req.verified){
+      return res.status(403).send() //User creds valid, but not verified
+    }
+
     console.log("Confirmed User Token");
     logger.logInfo(req.method,req.url,'Authorized token');
     req.startTime = startTime
