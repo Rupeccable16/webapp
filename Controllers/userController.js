@@ -86,7 +86,7 @@ exports.createUser = async (req, res) => {
   sendMetric("DbCreateLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
   const curr_timestamp = Date.now();
-  publishMessage({user_id: new_user.id},`user-${new_user.id}`,`user-${new_user.id}-timestamp-${curr_timestamp}`);
+  publishMessage({user_id: new_user.id, email: new_user.email});
   // const new_token = await Verification.create({
   //   user_id: new_user.id,
   //   url: `http://localhost:5000/v1/user/activate?token=${new_user.id}`,
