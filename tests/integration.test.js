@@ -30,6 +30,10 @@ describe("TEST! - Create and get user at /v1/user", ()=> {
             .post('/v1/user')
             .send(postData)
             .expect(201);
+
+        const curr_user = await User.findOne({where: {email: postData.email}})
+        curr_user.verified = true
+        await curr_user.save();
     });
 
     it("should retrieve user info", async() => {
