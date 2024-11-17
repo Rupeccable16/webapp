@@ -11,7 +11,7 @@ jobs:
   packer-build:
     if: |
       github.event.pull_request.merged == true ||
-      contains(github.ref, 'refs/heads/a06-01')
+      contains(github.ref, 'refs/heads/a08-01')
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
