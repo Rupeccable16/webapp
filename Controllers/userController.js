@@ -87,7 +87,7 @@ exports.createUser = async (req, res) => {
   
   const new_token = await Verification.create({
     user_id: new_user.id,
-    url: `http://localhost:5000/v1/user/activate?token=${new_user.id}`,
+    url: `http://demo.rupeshrokade.me/v1/user/activate?token=${new_user.id}`,
     expire_time: '180000'   //in milliseconds (3 min)
   })
 
