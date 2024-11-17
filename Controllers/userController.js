@@ -13,6 +13,8 @@ const saltRounds = 10;
 const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const sns = new SNSClient({region: process.env.AWS_REGION})
 const topicArn = process.env.TOPIC_ARN;
+const domain = process.env.APP_DOMAIN || "localhost:5000"
+const appVersion = process.env.APP_VERSION || "v1"
 
 async function publishMessage(message) {
   const params = {
@@ -87,7 +89,7 @@ exports.createUser = async (req, res) => {
   
   const new_token = await Verification.create({
     user_id: new_user.id,
-    url: `http://demo.rupeshrokade.me/v1/user/activate?token=${new_user.id}`,
+    url: `http://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
     expire_time: '180000'   //in milliseconds (3 min)
   })
 
@@ -164,7 +166,7 @@ exports.updateUser = async (req, res) => {
 
 exports.handleUserRequest = async (req, res) => {
   const startTime = req.startTime;
-  console.log("end point /v1/user/self");
+  console.log(`end point /${appVersion}/user/self`);
   try {
     //Cache control set to no cache
     res.setHeader("Cache-Control", "no-cache");
