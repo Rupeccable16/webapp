@@ -14,7 +14,7 @@ const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const sns = new SNSClient({region: process.env.AWS_REGION})
 const topicArn = process.env.TOPIC_ARN;
 const domain = process.env.APP_DOMAIN || "localhost:5000"
-const appVersion = process.env.APP_VERSION || "v1"
+const appVersion = "v1"
 
 async function publishMessage(message) {
   const params = {
