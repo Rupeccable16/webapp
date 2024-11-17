@@ -25,9 +25,9 @@ async function publishMessage(message, messageGrpId, messageDeduplicationId) {
 
   try{
     const result = await sns.publish(params).promise();
-    console.log('Message sent successfuly', result)
+    //console.log('Message sent successfuly', result)
   } catch (error) {
-    console.log('Error sending message', error);
+    //console.log('Error sending message', error);
   }
   
 }

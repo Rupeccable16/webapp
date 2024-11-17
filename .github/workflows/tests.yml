@@ -35,6 +35,7 @@ jobs:
           TEST_POSTDATA_FIRSTNAME: ${{ secrets.TEST_POSTDATA_FIRSTNAME }}
           TEST_POSTDATA_LASTNAME: ${{ secrets.TEST_POSTDATA_LASTNAME }}
           TEST_POSTDATA_PASS: ${{ secrets.TEST_POSTDATA_PASS }}
+          TOPIC_ARN: ${{ secrets.TOPIC_ARN }}
           ENVIRONMENT: "TEST"
           PORT: 5000
       - name: check completion
