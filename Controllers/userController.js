@@ -10,21 +10,19 @@ const {
 } = require("../awsS3Connect");
 const { DATE } = require("sequelize");
 const saltRounds = 10;
-const AWS = require('aws-sdk');
-AWS.config.update({region: process.env.AWS_REGION})
-const sns = new AWS.SNS();
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+const sns = new SNSClient({region: process.env.AWS_REGION})
 const topicArn = process.env.TOPIC_ARN;
 
-async function publishMessage(message, messageGrpId, messageDeduplicationId) {
+async function publishMessage(message) {
   const params = {
     Message: JSON.stringify(message),
     TopicArn: topicArn,
-    MessageGroupId: messageGrpId,
-    MessageDeduplicationId: messageDeduplicationId
   }
 
   try{
-    const result = await sns.publish(params).promise();
+    const command = new PublishCommand(params);
+    const result = await sns.send(command);
     //console.log('Message sent successfuly', result)
   } catch (error) {
     //console.log('Error sending message', error);
