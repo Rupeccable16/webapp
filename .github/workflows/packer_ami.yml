@@ -5,7 +5,7 @@ on:
       - closed
   push:
     branches:
-      - a06-01
+      - a08-01
       - main
 jobs:
   packer-build:
