@@ -5,13 +5,13 @@ on:
       - closed
   push:
     branches:
-      - a08-01
+      - a08-00
       - main
 jobs:
   packer-build:
     if: |
       github.event.pull_request.merged == true ||
-      contains(github.ref, 'refs/heads/a08-01')
+      contains(github.ref, 'refs/heads/a08-00')
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
@@ -78,4 +78,14 @@ jobs:
       - name: packer build
         run: |
           packer build \
-          -var-file=variables.pkrvars.hcl .
+          -var-file=variables.pkrvars.hcl . | tee build_output.txt
+          AMI_ID=$(tail -n 50 build_output.txt | grep 'AMI: ami-' | awk '{print $2}')
+          echo "Extracted AMI_ID: $AMI_ID"
+          echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
+      - name: switching to demo profile
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          aws-access-key-id: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.DEMO_AWS_REGION }}  
+      

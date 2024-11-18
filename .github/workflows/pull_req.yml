@@ -2,6 +2,9 @@ name: pull_req workflow
 on:
   pull_request:
     branches: [main]
+  push:
+    branches:
+      - a08-01
 jobs:
   npm-install:
     runs-on: ubuntu-latest
@@ -14,3 +17,15 @@ jobs:
         run: npm install
       - name: check completion
         run: echo "Check completion"
+      - name: install aws cli
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}              
+      - name: switching to demo profile
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          aws-access-key-id: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.DEMO_AWS_REGION }}        
