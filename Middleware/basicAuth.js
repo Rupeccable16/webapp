@@ -69,6 +69,9 @@ exports.authorize = async (req, res, next) => {
     req.user = user;
     console.log('Checking req.verified in basic auth', user.verified);
     if (!user.verified){
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
+      logger.logError(req.method,req.url,'Unverified user');
       return res.status(403).send() //User creds valid, but not verified
     }
 
