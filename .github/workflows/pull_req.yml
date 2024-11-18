@@ -2,6 +2,9 @@ name: pull_req workflow
 on:
   pull_request:
     branches: [main]
+  push:
+    branches:
+      - a08-04
 jobs:
   npm-install:
     runs-on: ubuntu-latest
