@@ -49,6 +49,8 @@ jobs:
           --version-description "AMI Update $(date +%Y%m%d%H%M%S)" \
           --source-version "1" \
           --launch-template-data "ImageId=$AMI_ID"
+
+          echo "ImageId=$AMI_ID"
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
