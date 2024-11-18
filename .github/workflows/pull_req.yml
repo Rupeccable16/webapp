@@ -50,11 +50,7 @@ jobs:
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
-          REFRESH_ID=$(aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name my-auto-scaling-group \
-            --preferences '{"MinHealthyPercentage": 90, "InstanceWarmup": 300}' \
-            --query 'InstanceRefreshId' --output text)
-          echo "REFRESH_ID=${REFRESH_ID}" >> $GITHUB_ENV
+          aws autoscaling start-instance-refresh
           
       - name: Wait for Instance Refresh
         run: |
