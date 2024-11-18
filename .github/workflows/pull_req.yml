@@ -57,7 +57,7 @@ jobs:
           while true; do
             STATUS=$(aws autoscaling describe-instance-refreshes \
               --auto-scaling-group-name csye6225_asg \
-              --query 'InstanceRefreshes[?InstanceRefreshId==`'"$REFRESH_ID"'`].Status' \
+              --query "InstanceRefreshes[0].Status" \
               --output text)
             echo "Instance Refresh Status: $STATUS"
             if [[ "$STATUS" == "Successful" ]]; then
@@ -70,4 +70,3 @@ jobs:
               sleep 30
             fi
           done
-                     
