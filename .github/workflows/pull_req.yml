@@ -35,7 +35,7 @@ jobs:
           LAUNCH_TEMPLATE_ID=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].LaunchTemplateId')
           DEFAULT_VERSION=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].DefaultVersionNumber')
           LATEST_VERSION=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].LatestVersionNumber')
-          AMI_ID=ami-0305ed3ab44d34e9b
+          AMI_ID="ami-0305ed3ab44d34e9b"
           
           echo "LAUNCH_TEMPLATE_ID=${LAUNCH_TEMPLATE_ID}" >> $GITHUB_ENV
           echo "DEFAULT_VERSION=${DEFAULT_VERSION}" >> $GITHUB_ENV
