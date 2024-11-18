@@ -4,6 +4,7 @@ const healthzController = require('../Controllers/healthzController');
 const userController = require('../Controllers/userController');
 const basicAuth = require('../Middleware/basicAuth');
 const {logger,sendMetric} = require('../logger');
+const app = require('..');
 const domain = process.env.APP_DOMAIN
 const appVersion = "v2"  //Match this with userController's appVersion
 // const multer = require('multer');
