@@ -45,10 +45,10 @@ jobs:
           echo "LAUNCH_TEMPLATE_ID=${LAUNCH_TEMPLATE_ID}" >> $GITHUB_ENV
           echo "DEFAULT_VERSION=${DEFAULT_VERSION}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
-      - name: Update Launch Template with AMI ID
+      - name: Create launch template version with AMI ID
         run: |
           aws ec2 create-launch-template-version \
-          --launch-template-id $NEW_TEMPLATE_ID \
+          --launch-template-id $LAUNCH_TEMPLATE_ID \
           --version-description "AMI Update $(date +%Y%m%d%H%M%S)" \
           --launch-template-data "ImageId=ami-0b21d3c16d3f51bae"
       - name: Set default launch template version
