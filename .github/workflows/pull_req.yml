@@ -56,7 +56,7 @@ jobs:
         run: |
           while true; do
             STATUS=$(aws autoscaling describe-instance-refreshes \
-              --auto-scaling-group-name my-auto-scaling-group \
+              --auto-scaling-group-name csye6225_asg \
               --query 'InstanceRefreshes[?InstanceRefreshId==`'"$REFRESH_ID"'`].Status' \
               --output text)
             echo "Instance Refresh Status: $STATUS"
