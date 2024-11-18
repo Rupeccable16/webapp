@@ -60,7 +60,7 @@ jobs:
           --output text)
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name csye6225_asg \
-            --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version="$LATEST_VERSION"
+            --launch-template LaunchTemplateId="$LAUNCH_TEMPLATE_ID",Version="$Latest"
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
