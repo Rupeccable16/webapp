@@ -79,7 +79,7 @@ jobs:
         run: |
           packer build \
           -var-file=variables.pkrvars.hcl . | tee build_output.txt
-          AMI_ID=$(tail -n 50 build_output.txt | grep 'AMI: ami-' | awk '{print $2}')
+          AMI_ID=$(tail -n 50 build_output.txt | grep 'AMI: ami-' | sed 's/.*AMI: //')
           echo "Extracted AMI_ID: $AMI_ID"
           echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
       - name: switching to demo profile
