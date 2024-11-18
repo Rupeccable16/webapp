@@ -4,7 +4,7 @@ const server = require('../server');
 const {User} = require('../Models/userModel');
 const {sequelize, testDbConnection} = require('../db');
 const { client } = require('../logger');
-const appVersion = "v2";
+const appVersion = "v1";
 
 beforeAll(async() => {
     await sequelize.drop();

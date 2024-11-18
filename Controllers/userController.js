@@ -14,7 +14,7 @@ const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const sns = new SNSClient({region: process.env.AWS_REGION})
 const topicArn = process.env.TOPIC_ARN;
 const domain = process.env.APP_DOMAIN || "localhost:5000"
-const appVersion = "v2"
+const appVersion = "v1"
 
 async function publishMessage(message) {
   const params = {
@@ -87,13 +87,16 @@ exports.createUser = async (req, res) => {
 
   const curr_timestamp = Date.now();
   
+  dbStartTime3 = Date.now();
   const new_token = await Verification.create({
     user_id: new_user.id,
     url: `http://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
     expire_time: '180000'   //in milliseconds (3 min)
   })
+  sendMetric("DbVerificationCreateLatency", Date.now() - dbStartTime3, req.url, req.method, "Milliseconds");
 
   publishMessage({url: new_token.url, email: new_user.email});
+  logger.logInfo(req.method, req.url, "Successful Sent Message to SNS");
 
   console.log("Created new verification token object", new_token);
 
@@ -311,9 +314,13 @@ exports.handleUserRequest = async (req, res) => {
 
 exports.handleActivation = async(req,res) => {
   try{
+    logger.logInfo(req.method, req.url, "Handling API activation request");
+    const startTime = req.startTime
     const curr_time = Date.now()
     //Validate method
     if (req.method!='GET'){
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(405).send();
     }
 
@@ -322,17 +329,26 @@ exports.handleActivation = async(req,res) => {
 
     //Handle absence of token
     if (!token){
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(400).send();
     }
 
     console.log('This is the token and req.query', token, req.query);
 
     // const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
+    const dbStartTime = Date.now();
     const verification = await Verification.findOne({ where: {user_id: token}})
+    sendMetric("DbVerificationFindLatency", Date.now() - dbStartTime, req.url, req.method, "Milliseconds");
+
+    const dbStartTime2 = Date.now();
     const existing_user = await User.findOne({ where: {id: token}})
+    sendMetric("DbFindLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
     if (existing_user.verified) {
       console.log('User is already verified');
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       return res.status(400).send();
     }
 
@@ -345,21 +361,30 @@ exports.handleActivation = async(req,res) => {
         
 
         //Update user to verified
+        const dbStartTime3 = Date.now()
         await User.update(
           {verified: true},
           {where: {id: verification.user_id}}
         )
+        sendMetric("DbUpdateLatency", Date.now() - dbStartTime3, req.url, req.method, "Milliseconds");
         // const user = await User.findOne({ where: {id: verification.user_id}})
         // console.log('Found updated user', user);
+        
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
+        
         return res.status(204).send();
 
         
 
       } else {
         console.log('Verification expired');
+        const timeDuration = Date.now() - startTime;
+        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
         return res.status(410).send(); //Gone
       }
     } else {
+      const timeDuration = Date.now() - startTime;
+      sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
       console.log('Verification entry not found')
       return res.status(400).send();
     }
