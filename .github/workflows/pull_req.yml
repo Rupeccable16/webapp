@@ -16,7 +16,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}              
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: pull latest ami
+        run: |
+          AMI_ID=$(aws ec2 describe-images --executable-users self --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV              
       - name: switching to demo profile
         uses: aws-actions/configure-aws-credentials@v4
         with: 
@@ -35,12 +39,12 @@ jobs:
           LAUNCH_TEMPLATE_ID=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].LaunchTemplateId')
           DEFAULT_VERSION=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].DefaultVersionNumber')
           LATEST_VERSION=$(echo $TEMPLATE_DETAILS | jq -r '.LaunchTemplates[0].LatestVersionNumber')
-          AMI_ID="ami-0305ed3ab44d34e9b"
+          
           
           echo "LAUNCH_TEMPLATE_ID=${LAUNCH_TEMPLATE_ID}" >> $GITHUB_ENV
           echo "DEFAULT_VERSION=${DEFAULT_VERSION}" >> $GITHUB_ENV
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
-          echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
+          
           
       - name: Create launch template version with AMI ID
         run: |
