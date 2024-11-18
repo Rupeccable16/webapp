@@ -47,15 +47,6 @@ jobs:
           --version-description "AMI Update $(date +%Y%m%d%H%M%S)" \
           --source-version "1" \
           --launch-template-data "ImageId=ami-0b21d3c16d3f51bae"
-      - name: Set default launch template version
-        run: |
-          LATEST_VERSION=$(aws ec2 describe-launch-template-versions \
-          --launch-template-id $NEW_TEMPLATE_ID \
-          --query 'LatestVersionNumber' \
-          --output text)
-          aws autoscaling update-auto-scaling-group \
-          --auto-scaling-group-name csye6225_asg \
-          --launch-template LaunchTemplateId="lt-02bd6f550e33ab450",Version="\$Latest"
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
