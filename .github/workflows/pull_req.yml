@@ -50,7 +50,7 @@ jobs:
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
-          aws autoscaling start-instance-refresh
+          aws autoscaling start-instance-refresh --auto-scaling-group-name csye6225_asg
           
       - name: Wait for Instance Refresh
         run: |
