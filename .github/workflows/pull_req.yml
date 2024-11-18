@@ -55,11 +55,11 @@ jobs:
         run: |
           LATEST_VERSION=$(aws ec2 describe-launch-template-versions \
           --launch-template-id $NEW_TEMPLATE_ID \
-          --query 'LaunchTemplateVersions[-1].VersionNumber' \
+          --query 'LatestVersionNumber' \
           --output text)
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name csye6225_asg \
-            --launch-template "LaunchTemplateId=$NEW_TEMPLATE_ID,Version=$LATEST_VERSION"
+            --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version="$LATEST_VERSION"
       - name: Trigger Instance Refresh
         id: trigger_instance_refresh
         run: |
