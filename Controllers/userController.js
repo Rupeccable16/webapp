@@ -1,5 +1,5 @@
 const { sequelize } = require("../db");
-const { User, Images } = require("../Models/userModel");
+const { User, Images, Verification } = require("../Models/userModel");
 const app = require("../index");
 const bcrypt = require("bcrypt");
 const { logger, sendMetric } = require("../logger");
@@ -10,6 +10,27 @@ const {
 } = require("../awsS3Connect");
 const { DATE } = require("sequelize");
 const saltRounds = 10;
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+const sns = new SNSClient({region: process.env.AWS_REGION})
+const topicArn = process.env.TOPIC_ARN;
+const domain = process.env.APP_DOMAIN || "localhost:5000"
+const appVersion = "v2"
+
+async function publishMessage(message) {
+  const params = {
+    Message: JSON.stringify(message),
+    TopicArn: topicArn,
+  }
+
+  try{
+    const command = new PublishCommand(params);
+    const result = await sns.send(command);
+    //console.log('Message sent successfuly', result)
+  } catch (error) {
+    //console.log('Error sending message', error);
+  }
+  
+}
 
 exports.createUser = async (req, res) => {
   //Increment APICount
@@ -64,8 +85,23 @@ exports.createUser = async (req, res) => {
   });
   sendMetric("DbCreateLatency", Date.now() - dbStartTime2, req.url, req.method, "Milliseconds");
 
+  const curr_timestamp = Date.now();
+  
+  const new_token = await Verification.create({
+    user_id: new_user.id,
+    url: `http://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
+    expire_time: '180000'   //in milliseconds (3 min)
+  })
+
+  publishMessage({url: new_token.url, email: new_user.email});
+
+  console.log("Created new verification token object", new_token);
+
+  console.log("Here's the url", new_token.url);
+
   const userResponse = new_user.toJSON();
   delete userResponse.password;
+  delete userResponse.verified;
 
   logger.logInfo(req.method, req.url, "Successful API request");
 
@@ -130,7 +166,7 @@ exports.updateUser = async (req, res) => {
 
 exports.handleUserRequest = async (req, res) => {
   const startTime = req.startTime;
-  console.log("end point /v1/user/self");
+  console.log(`end point /${appVersion}/user/self`);
   try {
     //Cache control set to no cache
     res.setHeader("Cache-Control", "no-cache");
@@ -272,6 +308,67 @@ exports.handleUserRequest = async (req, res) => {
     return res.status(400).send();
   }
 };
+
+exports.handleActivation = async(req,res) => {
+  try{
+    const curr_time = Date.now()
+    //Validate method
+    if (req.method!='GET'){
+      return res.status(405).send();
+    }
+
+    //Extracting token
+    const token = req.query.token;
+
+    //Handle absence of token
+    if (!token){
+      return res.status(400).send();
+    }
+
+    console.log('This is the token and req.query', token, req.query);
+
+    // const decoded = jwt.verify(token, proccess.env.JWT_SECRET);
+    const verification = await Verification.findOne({ where: {user_id: token}})
+    const existing_user = await User.findOne({ where: {id: token}})
+
+    if (existing_user.verified) {
+      console.log('User is already verified');
+      return res.status(400).send();
+    }
+
+    console.log('Found verification entry', verification)
+
+    if (verification){
+      console.log('If statement calculating time using .getTime()', curr_time,verification.url_created.getTime(), curr_time - verification.url_created.getTime(), verification.expire_time);
+      if (curr_time - verification.url_created.getTime() <= verification.expire_time){
+        console.log('Verification not expired')
+        
+
+        //Update user to verified
+        await User.update(
+          {verified: true},
+          {where: {id: verification.user_id}}
+        )
+        // const user = await User.findOne({ where: {id: verification.user_id}})
+        // console.log('Found updated user', user);
+        return res.status(204).send();
+
+        
+
+      } else {
+        console.log('Verification expired');
+        return res.status(410).send(); //Gone
+      }
+    } else {
+      console.log('Verification entry not found')
+      return res.status(400).send();
+    }
+
+  } catch(error){
+    console.log(error);
+    return res.status(400).send();
+  }
+}
 
 exports.processPicRequest = async (req, res) => {
   // console.log("req headers", req.headers['content-type']);

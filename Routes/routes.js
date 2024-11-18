@@ -4,6 +4,9 @@ const healthzController = require('../Controllers/healthzController');
 const userController = require('../Controllers/userController');
 const basicAuth = require('../Middleware/basicAuth');
 const {logger,sendMetric} = require('../logger');
+const app = require('..');
+const domain = process.env.APP_DOMAIN
+const appVersion = "v2"  //Match this with userController's appVersion
 // const multer = require('multer');
 // const storage = multer.memoryStorage();
 // const upload = multer({storage: storage});
@@ -38,11 +41,12 @@ router.use(express.json());
 router.use(jsonErrorHandler);
 
 router.all('/healthz',healthzController.healthz);
-router.all('/v1/user',userController.createUser);
-router.all('/v1/user/self', basicAuth.authorize, userController.handleUserRequest);
-router.post('/v1/user/self/pic',basicAuth.authorize,basicAuth.uploadFile, userController.processPicRequest)
-router.get('/v1/user/self/pic', basicAuth.authorize,userController.processPicRequest);
-router.delete('/v1/user/self/pic', basicAuth.authorize,userController.processPicRequest);
+router.all(`/${appVersion}/user`,userController.createUser);
+router.get(`/${appVersion}/user/activate`, userController.handleActivation);
+router.all(`/${appVersion}/user/self`, basicAuth.authorize, userController.handleUserRequest);
+router.post(`/${appVersion}/user/self/pic`,basicAuth.authorize,basicAuth.uploadFile, userController.processPicRequest)
+router.get(`/${appVersion}/user/self/pic`, basicAuth.authorize,userController.processPicRequest);
+router.delete(`/${appVersion}/user/self/pic`, basicAuth.authorize,userController.processPicRequest);
 
 
 //All endpoints other than above mentioned are rejected

@@ -42,6 +42,10 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,  //explicitly set to true when verified by user
+    }
   },
   {
     timestamps: false,
@@ -81,4 +85,36 @@ const Images = sequelize.define(
   }
 );
 
-module.exports = { User, Images };
+const Verification = sequelize.define(
+  "Verification",
+  {
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
+    url: {
+      type: DataTypes.TEXT,
+      allowNull: false, 
+    },
+    url_created: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false     
+    },
+    expire_time: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }, 
+  },
+  {
+    timestamps: false
+  }
+)
+
+module.exports = { User, Images, Verification };

@@ -4,6 +4,7 @@ const server = require('../server');
 const {User} = require('../Models/userModel');
 const {sequelize, testDbConnection} = require('../db');
 const { client } = require('../logger');
+const appVersion = "v2";
 
 beforeAll(async() => {
     await sequelize.drop();
@@ -23,28 +24,32 @@ const changeData = {
 }
 
 //Creating account and then use get to validate if acc exists
-describe("TEST! - Create and get user at /v1/user", ()=> {
+describe(`TEST! - Create and get user at /${appVersion}/user`, ()=> {
     it("should respond w expected response", async() => {
         console.log("Entering test1");
         const response = await request(app)
-            .post('/v1/user')
+            .post(`/${appVersion}/user`)
             .send(postData)
             .expect(201);
+
+        const curr_user = await User.findOne({where: {email: postData.email}})
+        curr_user.verified = true
+        await curr_user.save();
     });
 
     it("should retrieve user info", async() => {
         console.log("Entering test2");
         const response = await request(app)
-            .get('/v1/user/self')
+            .get(`/${appVersion}/user/self`)
             .auth(postData.email,postData.password)
             .expect(200);
     });
 });
 
-describe("Test2 - Edit user and get user at /v1/user", () => {
+describe(`Test2 - Edit user and get user at /${appVersion}/user`, () => {
     it("should respond with expected response", async() => {
         const response = await request(app).
-            put('/v1/user/self')
+            put(`/${appVersion}/user/self`)
             .auth(postData.email, postData.password)
             .send(changeData);
             
@@ -53,7 +58,7 @@ describe("Test2 - Edit user and get user at /v1/user", () => {
 
     it("should retrieve user info", async() => {
         const response = await request(app)
-            .get('/v1/user/self')
+            .get(`/${appVersion}/user/self`)
             .auth(postData.email,changeData.password);
 
             expect(response.status).toBe(200);

@@ -57,7 +57,7 @@ exports.authorize = async (req, res, next) => {
 
   if (!user){
     logger.logError(req.method,req.url,'Unauthorized token');
-    console.log("Unauthorized User Token");
+    console.log("Unauthorized/Unverified User Token");
 
     const timeDuration = Date.now() - startTime;
     sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
@@ -67,6 +67,11 @@ exports.authorize = async (req, res, next) => {
 
   if (passAuth) {
     req.user = user;
+    console.log('Checking req.verified in basic auth', user.verified);
+    if (!user.verified){
+      return res.status(403).send() //User creds valid, but not verified
+    }
+
     console.log("Confirmed User Token");
     logger.logInfo(req.method,req.url,'Authorized token');
     req.startTime = startTime
