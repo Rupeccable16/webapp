@@ -76,7 +76,7 @@ exports.createUser = async (req, res) => {
 
   const hashedPass = bcrypt.hashSync(password, saltRounds);
 
-  dbStartTime2 = Date.now();
+  const dbStartTime2 = Date.now();
   const new_user = await User.create({
     first_name: first_name,
     last_name: last_name,
@@ -87,7 +87,7 @@ exports.createUser = async (req, res) => {
 
   const curr_timestamp = Date.now();
   
-  dbStartTime3 = Date.now();
+  const dbStartTime3 = Date.now();
   const new_token = await Verification.create({
     user_id: new_user.id,
     url: `http://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
