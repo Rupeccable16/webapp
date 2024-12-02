@@ -15,6 +15,7 @@ const bucketName = process.env.AWS_BUCKET_NAME;
 const region = process.env.AWS_REGION;
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const kmskeyid = process.env.AWS_S3_KEY
 
 //Create client before using
 const s3 = new S3Client({
@@ -47,6 +48,8 @@ async function uploadFile(file, contentType, contentDisposition, key) {
     Key: key,
     ContentType: contentType,
     ContentDisposition: contentDisposition,
+    ServerSideEncryption: "aws:kms",
+    SSEKMSKeyId: kmskeyid,
   });
   //console.log(command)
   try {
