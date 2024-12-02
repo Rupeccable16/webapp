@@ -8,9 +8,6 @@ on:
       - a08-demo
 jobs:
   packer-build:
-    if: |
-      github.event.pull_request.merged == true ||
-      contains(github.ref, 'refs/heads/a08-00')
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
