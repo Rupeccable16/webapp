@@ -370,7 +370,7 @@ exports.handleActivation = async(req,res) => {
         // const user = await User.findOne({ where: {id: verification.user_id}})
         // console.log('Found updated user', user);
         
-        sendMetric("APICallLatency", timeDuration, req.url, req.method, "Milliseconds");
+        //sendMetric("APICallLatency", Date.now, req.url, req.method, "Milliseconds");
         
         return res.status(204).send();
 
