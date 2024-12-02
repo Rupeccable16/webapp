@@ -90,7 +90,7 @@ exports.createUser = async (req, res) => {
   const dbStartTime3 = Date.now();
   const new_token = await Verification.create({
     user_id: new_user.id,
-    url: `http://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
+    url: `https://${domain}/${appVersion}/user/activate?token=${new_user.id}`,
     expire_time: '120000'   //in milliseconds (2 min)
   })
   sendMetric("DbVerificationCreateLatency", Date.now() - dbStartTime3, req.url, req.method, "Milliseconds");
