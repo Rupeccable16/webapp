@@ -41,6 +41,7 @@ router.use(express.json());
 router.use(jsonErrorHandler);
 
 router.all('/healthz',healthzController.healthz);
+router.all('/cicd',healthzController.cicd);
 router.all(`/${appVersion}/user`,userController.createUser);
 router.get(`/${appVersion}/user/activate`, userController.handleActivation);
 router.all(`/${appVersion}/user/self`, basicAuth.authorize, userController.handleUserRequest);

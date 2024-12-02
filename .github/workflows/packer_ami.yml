@@ -5,8 +5,7 @@ on:
       - closed
   push:
     branches:
-      - a08-00
-      - main
+      - a08-demo
 jobs:
   packer-build:
     if: |
